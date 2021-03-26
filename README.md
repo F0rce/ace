@@ -6,7 +6,7 @@
 # Ace Editor for Vaadin 14+
 
 Even <strong>more</strong> embeddable and lightweight 
-custom Vaadin widget - [Ace](http://ace.c9.io/) - The High Performance Code Editor
+Vaadin widget - [Ace](http://ace.c9.io/) - The High Performance Code Editor
 
 > Frontend is based on [lit-ace](https://npmjs.com/package/@f0rce/lit-ace) created by myself 
 
@@ -19,7 +19,7 @@ Install the component using [Vaadin Directory](https://vaadin.com/directory/comp
 <dependency>
    <groupId>de.f0rce</groupId>
    <artifactId>ace</artifactId>
-   <version>1.0.0</version>
+   <version>1.0.1</version>
 </dependency>
 
 <repository>

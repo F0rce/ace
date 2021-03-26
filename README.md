@@ -36,4 +36,4 @@ Install the component using [Vaadin Directory](https://vaadin.com/directory/comp
 
 ## License
 
-[MIT License](http://opensource.org/licenses/MIT)
+[MIT License](https://github.com/F0rce/ace/blob/master/LICENSE)

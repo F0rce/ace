@@ -140,7 +140,6 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	 */
 	public void setValue(String value) {
 		getElement().setProperty("value", value);
-		this.sync(); // To force the exchange between client and server.
 	};
 
 	/**

@@ -3,6 +3,7 @@
 [![Vaadin Directory](https://img.shields.io/vaadin-directory/v/ace)](https://vaadin.com/directory/component/ace)
 [![Vaadin Directory](https://img.shields.io/vaadin-directory/release-date/ace)](https://vaadin.com/directory/component/ace)
 ![Website](https://img.shields.io/website?down_message=offline&label=documentation&up_message=online&url=https%3A%2F%2Fdocs.f0rce.de%2Face)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FF0rce%2Face.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FF0rce%2Face?ref=badge_shield)
 
 # Ace Editor for Vaadin 14+
 
@@ -25,3 +26,6 @@ Install the component using [Vaadin Directory](https://vaadin.com/directory/comp
 ## License
 
 [MIT License](https://github.com/F0rce/ace/blob/master/LICENSE)
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FF0rce%2Face.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FF0rce%2Face?ref=badge_large)

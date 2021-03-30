@@ -2,6 +2,7 @@
 [![Stars on vaadin.com/directory](https://img.shields.io/vaadin-directory/star/ace.svg)](https://vaadin.com/directory/component/ace)
 [![Vaadin Directory](https://img.shields.io/vaadin-directory/v/ace)](https://vaadin.com/directory/component/ace)
 [![Vaadin Directory](https://img.shields.io/vaadin-directory/release-date/ace)](https://vaadin.com/directory/component/ace)
+![Website](https://img.shields.io/website?down_message=offline&label=documentation&up_message=online&url=https%3A%2F%2Fdocs.f0rce.de%2Face)
 
 # Ace Editor for Vaadin 14+
 
@@ -13,20 +14,7 @@ Vaadin widget - [Ace](http://ace.c9.io/) - The High Performance Code Editor
 
 ## Install
 
-Install the component using [Vaadin Directory](https://vaadin.com/directory/component/ace):
-
-```xml
-<dependency>
-   <groupId>de.f0rce</groupId>
-   <artifactId>ace</artifactId>
-   <version>1.0.1</version>
-</dependency>
-
-<repository>
-   <id>vaadin-addons</id>
-   <url>https://maven.vaadin.com/vaadin-addons</url>
-</repository>
-```
+Install the component using [Vaadin Directory](https://vaadin.com/directory/component/ace)
 
 
 ## Documentation

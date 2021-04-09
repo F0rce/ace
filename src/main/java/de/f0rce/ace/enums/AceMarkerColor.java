@@ -1,4 +1,4 @@
-package de.f0rce.ace;
+package de.f0rce.ace.enums;
 
 /**
  * @author David "F0rce" Dodlek

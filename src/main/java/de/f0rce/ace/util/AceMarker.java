@@ -1,6 +1,8 @@
-package de.f0rce.ace;
+package de.f0rce.ace.util;
 
 import java.util.UUID;
+
+import de.f0rce.ace.enums.AceMarkerColor;
 
 /**
  * @author David "F0rce" Dodlek

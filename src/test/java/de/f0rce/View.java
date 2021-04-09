@@ -18,9 +18,8 @@ import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 
 import de.f0rce.ace.AceEditor;
-import de.f0rce.ace.AceMarkerColor;
-import de.f0rce.ace.AceMode;
-import de.f0rce.ace.AceTheme;
+import de.f0rce.ace.enums.AceMode;
+import de.f0rce.ace.enums.AceTheme;
 
 @Theme(value = Lumo.class, variant = Lumo.DARK)
 @Route("")
@@ -116,16 +115,10 @@ public class View extends VerticalLayout {
 		});
 
 		button.addClickListener(event -> {
-			aceEditor.setValue("TEST");
+			aceEditor.generateHTML(true);
 		});
 		button2.addClickListener(event -> {
-			// aceEditor.setCustomAutoCompletion(new String[] { "TEST", "TEST2", "TEST3" });
-//			}
-
-			aceEditor.setVisible(true);
-			aceEditor.addMarkerAtCurrentSelection(AceMarkerColor.red);
-			aceEditor.removeMarkerByAlias(null);
-//			aceEditor.removeMarker(list.get(0));
+			aceEditor.replaceTextAtCurrentSelection(null);
 		});
 
 		Shortcuts.addShortcutListener(aceEditor, event -> {
@@ -137,6 +130,10 @@ public class View extends VerticalLayout {
 			aceEditor.sync();
 
 		}, Key.ENTER, KeyModifier.CONTROL).listenOn(aceEditor);
+
+		aceEditor.addHTMLGeneratedListener(event -> {
+			System.out.println(event.getHTML());
+		});
 
 		aceDialog.setHeight("1000px");
 		aceDialog.setWidth("2000px");

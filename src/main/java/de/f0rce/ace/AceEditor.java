@@ -1,9 +1,5 @@
 package de.f0rce.ace;
 
-/**
- * @author David "F0rce" Dodlek
- */
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,10 +15,23 @@ import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.shared.Registration;
 
+import de.f0rce.ace.enums.AceMarkerColor;
+import de.f0rce.ace.enums.AceMode;
+import de.f0rce.ace.enums.AceTheme;
+import de.f0rce.ace.events.AceBlurChanged;
+import de.f0rce.ace.events.AceForceSyncEvent;
+import de.f0rce.ace.events.AceHTMLGeneratedEvent;
+import de.f0rce.ace.events.AceSelectionChanged;
+import de.f0rce.ace.util.AceMarker;
+
+/**
+ * @author David "F0rce" Dodlek
+ */
+
 @SuppressWarnings("serial")
 @Tag("lit-ace")
-@NpmPackage(value = "@f0rce/lit-ace", version = "1.0.0")
-@JsModule("./@f0rce/lit-ace/lit-ace.js")
+@NpmPackage(value = "@f0rce/lit-ace", version = "1.1.1")
+@JsModule("@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 		implements HasSize, HasStyle, Focusable<AceEditor> {
 
@@ -49,7 +58,7 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	private boolean liveAutocompletion = false;
 	private boolean enableSnippets = true;
 	private String[] customAutoCompletion = new String[0];
-	private List<AceMarker> markers = new ArrayList<>();
+	private List<AceMarker> markers = new ArrayList<AceMarker>();
 
 	public AceEditor() {
 		super("value", "", false);
@@ -83,7 +92,7 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 
 	// Updates the private variables to ensure that client and server are up to date
 	private void updateSelection(AceBlurChanged event) {
-		this.cursorPosition = new int[] { event.getSelectionFrom(), event.getSelectionTo() };
+		this.cursorPosition = new int[] { event.getCursorRow(), event.getCursorColumn() };
 		this.selection = new int[] { event.getSelectionRowStart(), event.getSelectionFrom(), event.getSelectionRowEnd(),
 				event.getSelectionTo() };
 	};
@@ -430,39 +439,6 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	/**
 	 * Sets selection for the editor.
 	 * 
-	 * @param from int
-	 * @param to   int
-	 */
-	public void setSelection(int from, int to) {
-		from = Math.abs(from);
-		to = Math.abs(to);
-		if (to < from) {
-			int tmp = from;
-			from = to;
-			to = tmp;
-		}
-		getElement().setProperty("selection", 0 + "|" + from + "|" + 0 + "|" + to + "|" + UUID.randomUUID().toString());
-		this.selection = new int[] { 0, from, 0, to };
-		this.cursorPosition = new int[] { 0, to };
-	};
-
-	/**
-	 * Sets selection for the editor and optionally also sets the focus.
-	 * 
-	 * @param from  int
-	 * @param to    int
-	 * @param focus boolean
-	 */
-	public void setSelection(int from, int to, boolean focus) {
-		setSelection(from, to);
-		if (focus) {
-			this.focus();
-		}
-	};
-
-	/**
-	 * Sets selection for the editor.
-	 * 
 	 * @param rowStart int
 	 * @param from     int
 	 * @param rowEnd   int
@@ -538,34 +514,59 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	/**
 	 * Sets cursorPosition for the editor.
 	 * 
-	 * @param pos int
+	 * @param row    int
+	 * @param column int
 	 */
-	public void setCursorPosition(int pos) {
-		pos = Math.abs(pos);
-		if (pos > getValue().length() - 1) {
-			pos = getValue().length() - 1;
-		}
-		getElement().setProperty("selection", 0 + "|" + pos + "|" + 0 + "|" + pos + "|" + UUID.randomUUID().toString());
-		this.cursorPosition = new int[] { 0, pos };
-		this.selection = new int[] { 0, pos, 0, pos };
+	public void setCursorPosition(int row, int column) {
+		row = Math.abs(row);
+		column = Math.abs(column);
+
+		getElement().setProperty("cursorPosition", row + "|" + column + "|" + UUID.randomUUID().toString());
+		this.cursorPosition = new int[] { row, column };
+		this.selection = new int[] { row, column, row, column };
 	};
 
 	/**
 	 * Sets cursorPosition for the editor and optionally also sets the focus.
 	 * 
-	 * @param pos   int
-	 * @param focus boolean
+	 * @param row    int
+	 * @param column int
+	 * @param focus  boolean
 	 */
-	public void setCursorPosition(int pos, boolean focus) {
-		setCursorPosition(pos);
+	public void setCursorPosition(int row, int column, boolean focus) {
+		setCursorPosition(row, column);
 		if (focus) {
 			this.focus();
 		}
 	};
 
 	/**
+	 * Sets the cursor position via index and the frontend calculates the row for
+	 * it.
+	 * 
+	 * @param index int
+	 */
+	public void setCursorPosition(int index) {
+		getElement().callJsFunction("calculateCursorPositionFromIndex", index);
+	}
+
+	/**
+	 * Sets the cursor position via index and the frontend calculates the row for it
+	 * and sets the focus.
+	 * 
+	 * @param index int
+	 * @param focus boolean
+	 */
+	public void setCursorPosition(int index, boolean focus) {
+		this.setCursorPosition(index);
+		if (focus) {
+			this.focus();
+		}
+	}
+
+	/**
 	 * Returns the current set cursor position in the editor where the first index
-	 * represents the line and the second index represents the position.
+	 * represents the row and the second index represents the index/column.
 	 * 
 	 * @return int[]
 	 */
@@ -659,65 +660,30 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	};
 
 	/**
-	 * Adds text to a specific position of the editor.
+	 * Adds text to a specific position in the editor.
 	 * 
-	 * @param text     {@link String}
-	 * @param position int
+	 * @param row    int
+	 * @param column int
+	 * @param text   {@link String}
 	 */
-	public void addTextAtPosition(String text, int position) {
-		String currentVal = this.getValue();
-		StringBuilder newVal = new StringBuilder();
-		if (position > currentVal.length()) {
-			position = currentVal.length() - 1;
-		}
-		for (int x = 0; x < currentVal.length(); x++) {
-			newVal.append(currentVal.charAt(x));
-			if (x == position) {
-				newVal.append(text);
-			}
-		}
-		this.setValue(newVal.toString());
-		this.selection = new int[] { 0, this.getValue().length() - 1, 0, this.getValue().length() - 1 };
-		this.cursorPosition = new int[] { 0, this.getValue().length() - 1 };
+	public void addTextAtPosition(int row, int column, String text) {
+		getElement().callJsFunction("insertText", row, column, text);
 	};
 
 	/**
-	 * Adds text at the current position of the editor.<br>
-	 * <br>
-	 * <b>First Priority:</b> If there is a selection, the selection will be
-	 * replaced.<br>
-	 * <b>Second Priority:</b> If the cursor position has been set, the text will be
-	 * added at the position of the cursor.<br>
-	 * <b>Third/Last Priority:</b> If no text is selected and the cursor has not
-	 * been set, the text will be added to the end of the text.<br>
-	 * <br>
+	 * Adds text at the current cursor position in the editor.
 	 * 
 	 * @param text {@link String}
 	 */
 	public void addTextAtCurrentPosition(String text) {
-		String currentVal = this.getValue();
-		if (this.selection != new int[] { 0, 0, 0, 0 }) {
-			int from = this.selection[1];
-			int to = this.selection[3];
-			String toReplace = currentVal.substring(from, to);
-			String newVal = currentVal.replace(toReplace, text);
-			this.setValue(newVal);
-			this.selection = new int[] { 0, 0, 0, 0 };
-			this.cursorPosition = new int[] { 0, currentVal.length() - 1 };
-		} else if (this.cursorPosition != new int[] { 0, 0 }) {
-			addTextAtPosition(text, this.cursorPosition[1]);
-			this.cursorPosition = new int[] { 0, currentVal.length() - 1 };
-			this.selection = new int[] { 0, 0, 0, 0 };
-		} else {
-			addTextAtPosition(text, currentVal.length() - 1);
-			this.cursorPosition = new int[] { 0, currentVal.length() - 1 };
-			this.selection = new int[] { 0, 0, 0, 0 };
-		}
+		this.addTextAtPosition(this.cursorPosition[0], this.cursorPosition[1], text);
 	};
 
 	/**
-	 * Adds a marker to the editor at the current selection. If the returned string
-	 * is null, there is no current selection. Use any addMarkerAtSelection() method
+	 * Adds a marker to the editor at the current selection. If the returned
+	 * {@link AceMarker} is null, there is no current selection. Use
+	 * {@link #addMarkerAtSelection(int, int, int, int, AceMarkerColor)} or
+	 * {@link #addMarkerAtSelection(int, int, int, int, AceMarkerColor, String)}
 	 * instead. If the marker is not visible make sure that
 	 * {@link #setHighlightActiveLine(boolean)} and
 	 * {@link #setHighlightSelectedWord(boolean)} are set to false.
@@ -742,8 +708,10 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	};
 
 	/**
-	 * Adds a marker to the editor at the current selection. If the returned string
-	 * is null, there is no current selection. Use any addMarkerAtSelection() method
+	 * Adds a marker to the editor at the current selection. If the returned
+	 * {@link AceMarker} is null, there is no current selection. Use
+	 * {@link #addMarkerAtSelection(int, int, int, int, AceMarkerColor)} or
+	 * {@link #addMarkerAtSelection(int, int, int, int, AceMarkerColor, String)}
 	 * instead. If the marker is not visible make sure that
 	 * {@link #setHighlightActiveLine(boolean)} and
 	 * {@link #setHighlightSelectedWord(boolean)} are set to false.
@@ -766,34 +734,6 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 			return marker;
 		}
 		return null;
-	};
-
-	/**
-	 * Adds a marker to the editor. If the marker is not visible make sure that
-	 * {@link #setHighlightActiveLine(boolean)} and
-	 * {@link #setHighlightSelectedWord(boolean)} are set to false.
-	 * 
-	 * @param from  int
-	 * @param to    int
-	 * @param color {@link AceMarkerColor}
-	 * 
-	 * @return {@link AceMarker}
-	 */
-	public AceMarker addMarkerAtSelection(int from, int to, AceMarkerColor color) {
-		from = Math.abs(from);
-		to = Math.abs(to);
-		if (to < from) {
-			int tmp = from;
-			from = to;
-			to = tmp;
-		}
-
-		AceMarker marker = new AceMarker(from, to, color);
-
-		getElement().setProperty("marker", 0 + "|" + marker.getFrom() + "|" + 0 + "|" + marker.getTo() + "|"
-				+ marker.getAceMarkerColor().toString() + "|" + marker.getID());
-		this.markers.add(marker);
-		return marker;
 	};
 
 	/**
@@ -829,35 +769,6 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 
 		getElement().setProperty("marker", marker.getRowStart() + "|" + marker.getFrom() + "|" + marker.getRowEnd()
 				+ "|" + marker.getTo() + "|" + marker.getAceMarkerColor().toString() + "|" + marker.getID());
-		this.markers.add(marker);
-		return marker;
-	};
-
-	/**
-	 * Adds a marker to the editor. If the marker is not visible make sure that
-	 * {@link #setHighlightActiveLine(boolean)} and
-	 * {@link #setHighlightSelectedWord(boolean)} are set to false.
-	 * 
-	 * @param from  int
-	 * @param to    int
-	 * @param color {@link AceMarkerColor}
-	 * @param alias {@link String}
-	 *
-	 * @return {@link AceMarker}
-	 */
-	public AceMarker addMarkerAtSelection(int from, int to, AceMarkerColor color, String alias) {
-		from = Math.abs(from);
-		to = Math.abs(to);
-		if (to < from) {
-			int tmp = from;
-			from = to;
-			to = tmp;
-		}
-
-		AceMarker marker = new AceMarker(from, to, color, alias);
-
-		getElement().setProperty("marker", 0 + "|" + marker.getFrom() + "|" + 0 + "|" + marker.getTo() + "|"
-				+ marker.getAceMarkerColor().toString() + "|" + marker.getID());
 		this.markers.add(marker);
 		return marker;
 	};
@@ -976,7 +887,7 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	 */
 	public void removeAllMarkers() {
 		getElement().setProperty("rmMarker", "all" + UUID.randomUUID().toString());
-		this.markers = new ArrayList<>();
+		this.markers = new ArrayList<AceMarker>();
 	}
 
 	/**
@@ -992,7 +903,7 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 
 	/**
 	 * Forces a sync between client and server without blurring. Use
-	 * {@link #addSyncCompletedListener(ComponentEventListener)} to get the value
+	 * {@link #addSyncCompletedListener(ComponentEventListener)} to get the values
 	 * after the sync completed.
 	 */
 	public void sync() {
@@ -1009,5 +920,43 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	 */
 	public Registration addSyncCompletedListener(ComponentEventListener<AceForceSyncEvent> listener) {
 		return addListener(AceForceSyncEvent.class, listener);
+	}
+
+	/**
+	 * Generates a fully functional static HTML-String with the current value of the
+	 * editor, which can be used to print for example. Use
+	 * {@link #addHTMLGeneratedListener(ComponentEventListener)} to get the HTML as
+	 * soon as the generate is done.
+	 * 
+	 * @param raw boolean
+	 */
+	public void generateHTML(boolean raw) {
+		getElement().callJsFunction("generateHTML", raw);
+	}
+
+	/**
+	 * Add a listener to the editor, which listens to when the HTML generate
+	 * completed, which is triggered by the {@link #generateHTML(boolean)} method.
+	 * Check {@link AceHTMLGeneratedEvent} for all availible returned values.
+	 * 
+	 * @param listener {@link ComponentEventListener}
+	 * @return {@link Registration}
+	 */
+	public Registration addHTMLGeneratedListener(ComponentEventListener<AceHTMLGeneratedEvent> listener) {
+		return addListener(AceHTMLGeneratedEvent.class, listener);
+	}
+
+	/**
+	 * Replaces the current selection with given text.
+	 * 
+	 * @param text {@link String}
+	 */
+	public void replaceTextAtCurrentSelection(String text) {
+		if (this.selection != new int[] { 0, 0, 0, 0 }) {
+			if (text == null) {
+				text = "";
+			}
+			getElement().callJsFunction("replaceTextAtSelection", text);
+		}
 	}
 }

@@ -6,12 +6,12 @@
 
 	<groupId>de.f0rce</groupId>
 	<artifactId>ace</artifactId>
-	<version>1.0.1</version>
+	<version>1.1.0</version>
 	<name>ace</name>
 	<description>Lit-Element Wrapper around the Ace Editor (https://ace.c9.io/) for Vaadin 14+</description>
 
 	<properties>
-		<vaadin.version>14.4.10</vaadin.version>
+		<vaadin.version>14.5.1</vaadin.version>
 
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
@@ -186,13 +186,6 @@
 					<supportedPackagings>
 						<supportedPackaging>jar</supportedPackaging>
 					</supportedPackagings>
-					<webAppConfig>
-						<resourceBases>
-							<baseResource>
-								src/main/resources/META-INF/resources
-							</baseResource>
-						</resourceBases>
-					</webAppConfig>
 				</configuration>
 			</plugin>
 		</plugins>

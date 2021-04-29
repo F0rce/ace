@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.Shortcuts;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -115,21 +114,19 @@ public class View extends VerticalLayout {
 		});
 
 		button.addClickListener(event -> {
-			aceEditor.generateHTML(true);
+			aceEditor.focus();
 		});
 		button2.addClickListener(event -> {
-			aceEditor.replaceTextAtCurrentSelection(null);
+			aceEditor.disableCustomAutoCompletion();
 		});
 
 		Shortcuts.addShortcutListener(aceEditor, event -> {
-			System.out.println(aceEditor.getValue());
-			System.out.println("_________________");
 			aceEditor.addSyncCompletedListener(evt -> {
-				System.out.println(evt.getValue());
+				// current cursor position
 			});
 			aceEditor.sync();
 
-		}, Key.ENTER, KeyModifier.CONTROL).listenOn(aceEditor);
+		}, Key.ARROW_RIGHT).listenOn(aceEditor);
 
 		aceEditor.addHTMLGeneratedListener(event -> {
 			System.out.println(event.getHTML());

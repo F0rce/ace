@@ -1,14 +1,12 @@
-package de.f0rce.ace.events;
+package de.f0rce.ace;
 
 import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.DomEvent;
+import com.vaadin.flow.component.EventData;
 
-import de.f0rce.ace.AceEditor;
-
-/**
- * @author David "F0rce" Dodlek
- */
-
-public class AceForceSyncEvent extends ComponentEvent<AceEditor> {
+@SuppressWarnings("serial")
+@DomEvent("force-sync")
+class AceForceSyncDomEvent extends ComponentEvent<AceEditor> {
 
 	private String value;
 	private String selectedText;
@@ -19,8 +17,10 @@ public class AceForceSyncEvent extends ComponentEvent<AceEditor> {
 	private int cursorRow;
 	private int cursorColumn;
 
-	public AceForceSyncEvent(AceEditor source, boolean fromClient, String value, String selectionValue,
-			String selectedText, String cursorPosition) {
+	public AceForceSyncDomEvent(AceEditor source, boolean fromClient, @EventData("event.detail.value") String value,
+			@EventData("event.detail.selection") String selectionValue,
+			@EventData("event.detail.selectedText") String selectedText,
+			@EventData("event.detail.cursorPosition") String cursorPosition) {
 		super(source, fromClient);
 		this.value = value;
 		this.selectedText = selectedText;
@@ -106,5 +106,4 @@ public class AceForceSyncEvent extends ComponentEvent<AceEditor> {
 	public int getCursorColumn() {
 		return cursorColumn;
 	}
-
 }

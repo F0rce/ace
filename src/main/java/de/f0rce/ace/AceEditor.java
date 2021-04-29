@@ -2,6 +2,7 @@ package de.f0rce.ace;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import com.vaadin.flow.component.AbstractSinglePropertyField;
@@ -31,7 +32,8 @@ import de.f0rce.ace.util.AceMarker;
 @SuppressWarnings("serial")
 @Tag("lit-ace")
 @NpmPackage(value = "@f0rce/lit-ace", version = "1.1.1")
-@JsModule("@f0rce/lit-ace/lit-ace.js")
+//@JsModule("@f0rce/lit-ace/lit-ace.js")
+@JsModule("./lit-ace.js")
 public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 		implements HasSize, HasStyle, Focusable<AceEditor> {
 
@@ -59,18 +61,22 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	private boolean enableSnippets = true;
 	private String[] customAutoCompletion = new String[0];
 	private List<AceMarker> markers = new ArrayList<AceMarker>();
+	private String selectedText = "";
 
 	public AceEditor() {
 		super("value", "", false);
-		super.addListener(AceBlurChanged.class, this::updateText);
+		super.addListener(AceBlurChanged.class, this::updateEditor);
+		super.addListener(AceForceSyncDomEvent.class, this::onForceSyncDomEvent);
 
 		this.setHeight("300px");
 		this.setWidth("100%");
+
 	}
 
 	public AceEditor(AceTheme theme, AceMode mode, String height, String width) {
 		super("value", "", false);
-		super.addListener(AceBlurChanged.class, this::updateText);
+		super.addListener(AceBlurChanged.class, this::updateEditor);
+		super.addListener(AceForceSyncDomEvent.class, this::onForceSyncDomEvent);
 
 		this.setTheme(theme);
 		this.setMode(mode);
@@ -85,9 +91,9 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 
 	// Updates the Text and selection after the Blur event has been fired (Keyboard
 	// lost focus)
-	private void updateText(AceBlurChanged event) {
-		setValue(event.getValue());
+	private void updateEditor(AceBlurChanged event) {
 		updateSelection(event);
+		setValue(event.getValue());
 	};
 
 	// Updates the private variables to ensure that client and server are up to date
@@ -96,6 +102,19 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 		this.selection = new int[] { event.getSelectionRowStart(), event.getSelectionFrom(), event.getSelectionRowEnd(),
 				event.getSelectionTo() };
 	};
+
+	private void onForceSyncDomEvent(AceForceSyncDomEvent event) {
+		this.selectedText = event.getSelectedText();
+		this.selection = new int[] { event.getSelectionRowStart(), event.getSelectionFrom(), event.getSelectionRowEnd(),
+				event.getSelectionTo() };
+		this.cursorPosition = new int[] { event.getCursorRow(), event.getCursorColumn() };
+		setValue(event.getValue());
+
+		fireEvent(new AceForceSyncEvent(event.getSource(), event.isFromClient(), event.getValue(),
+				event.getSelectionRowStart() + "|" + event.getSelectionFrom() + "|" + event.getSelectionRowEnd() + "|"
+						+ event.getSelectionTo() + "|-",
+				event.getSelectedText(), event.getCursorRow() + "|" + event.getCursorColumn() + "|-"));
+	}
 
 	/**
 	 * Sets the mode (language) of the editor.
@@ -622,9 +641,26 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 			this.customAutoCompletion = new String[0];
 			return;
 		}
-		getElement().setProperty("customAutoCompletion", "|" + String.join(",", wordList));
+		getElement().setProperty("customAutoCompletion", "|" + String.join(",", wordList) + "|" + false);
 		this.customAutoCompletion = wordList;
 	};
+
+	/**
+	 * Sets a custom autocompletion list for the editor and optionally keeps the
+	 * current completers.
+	 * 
+	 * @param wordList              String[]
+	 * @param keepCurrentCompleters boolean
+	 */
+	public void setCustomAutoCompletion(String[] wordList, boolean keepCurrentCompleters) {
+		if (wordList.length == 0) {
+			this.customAutoCompletion = new String[0];
+			return;
+		}
+		getElement().setProperty("customAutoCompletion",
+				"|" + String.join(",", wordList) + "|" + keepCurrentCompleters);
+		this.customAutoCompletion = wordList;
+	}
 
 	/**
 	 * Sets a custom autocompletion list for the editor and sets the category aswell
@@ -643,6 +679,24 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	};
 
 	/**
+	 * Sets a custom autocompletion list for the editor, sets the category (default:
+	 * "") and optionally keeps the current completers.
+	 * 
+	 * @param wordList              String[]
+	 * @param category              {@link String}
+	 * @param keepCurrentCompleters boolean
+	 */
+	public void setCustomAutoCompletion(String[] wordList, String category, boolean keepCurrentCompleters) {
+		if (wordList.length == 0) {
+			this.customAutoCompletion = new String[0];
+			return;
+		}
+		getElement().setProperty("customAutoCompletion",
+				category + "|" + String.join(",", wordList) + "|" + keepCurrentCompleters);
+		this.customAutoCompletion = wordList;
+	};
+
+	/**
 	 * Returns a String array of the current custom autocompletion for the editor.
 	 * 
 	 * @return String[]
@@ -656,7 +710,7 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	 * and replaces it with the default one.
 	 */
 	public void disableCustomAutoCompletion() {
-		getElement().setProperty("customAutoCompletion", "|");
+		getElement().setProperty("customAutoCompletion", "||");
 	};
 
 	/**
@@ -959,4 +1013,28 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 			getElement().callJsFunction("replaceTextAtSelection", text);
 		}
 	}
+
+	/**
+	 * Focuses the textarea of the ace editor.
+	 */
+	@Override
+	public void focus() {
+		getElement().callJsFunction("focusEditor");
+	}
+
+	public void runAfterSync(Runnable action) {
+		Objects.requireNonNull(action);
+		addListener(AceForceSyncDomEvent.class, event -> runAfterSync(event, action));
+		sync();
+	}
+
+	private void runAfterSync(AceForceSyncDomEvent event, Runnable action) {
+		event.unregisterListener();
+		action.run();
+	}
+
+	public String getSelectedText() {
+		return this.selectedText;
+	}
+
 }

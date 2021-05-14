@@ -11,7 +11,7 @@
 	<description>Lit-Element Wrapper around the Ace Editor (https://ace.c9.io/) for Vaadin 14+</description>
 
 	<properties>
-		<vaadin.version>14.5.3</vaadin.version>
+		<vaadin.version>14.6.0</vaadin.version>
 
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
@@ -25,8 +25,8 @@
 	</organization>
 	<licenses>
 		<license>
-			<name>Apache 2</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<name>MIT</name>
+			<url>https://opensource.org/licenses/MIT</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>

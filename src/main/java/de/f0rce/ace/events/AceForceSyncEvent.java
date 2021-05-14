@@ -8,6 +8,7 @@ import de.f0rce.ace.AceEditor;
  * @author David "F0rce" Dodlek
  */
 
+@SuppressWarnings("serial")
 public class AceForceSyncEvent extends ComponentEvent<AceEditor> {
 
 	private String value;

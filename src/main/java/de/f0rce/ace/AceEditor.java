@@ -31,9 +31,9 @@ import de.f0rce.ace.util.AceMarker;
 
 @SuppressWarnings("serial")
 @Tag("lit-ace")
-@NpmPackage(value = "@f0rce/lit-ace", version = "1.1.1")
+@NpmPackage(value = "@f0rce/lit-ace", version = "1.1.3")
 //@JsModule("@f0rce/lit-ace/lit-ace.js")
-@JsModule("./lit-ace.js")
+@JsModule("./@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 		implements HasSize, HasStyle, Focusable<AceEditor> {
 
@@ -43,7 +43,6 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	private boolean softTabs = true;
 	private int tabSize = 4;
 	private boolean wrap = false;
-	private String basePath = "";
 	private boolean autoComplete = false;
 	private boolean initialFocus = false;
 	private String placeHolder = "";
@@ -93,7 +92,6 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	// lost focus)
 	private void updateEditor(AceBlurChanged event) {
 		updateSelection(event);
-		setValue(event.getValue());
 	};
 
 	// Updates the private variables to ensure that client and server are up to date
@@ -103,6 +101,7 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 				event.getSelectionTo() };
 	};
 
+	// Keeps the editor up to date and is backwards compatible
 	private void onForceSyncDomEvent(AceForceSyncDomEvent event) {
 		this.selectedText = event.getSelectedText();
 		this.selection = new int[] { event.getSelectionRowStart(), event.getSelectionFrom(), event.getSelectionRowEnd(),
@@ -320,25 +319,6 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	 */
 	public boolean isReadOnly() {
 		return this.readOnly;
-	};
-
-	/**
-	 * Sets BasePath / BaseUrl.
-	 * 
-	 * @param baseurl {@link String}
-	 */
-	public void setBasePath(String baseurl) {
-		getElement().setProperty("baseUrl", baseurl);
-		this.basePath = baseurl;
-	};
-
-	/**
-	 * Return the current BasePath / BaseUrl.
-	 * 
-	 * @return {@link String}
-	 */
-	public String getBasePath() {
-		return this.basePath;
 	};
 
 	/**
@@ -578,6 +558,30 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	 */
 	public void setCursorPosition(int index, boolean focus) {
 		this.setCursorPosition(index);
+		if (focus) {
+			this.focus();
+		}
+	}
+
+	/**
+	 * Sets the cursor position in the editor where the first index represents the
+	 * row and the second index represents the index/column.
+	 * 
+	 * @param cursorPosition int[]
+	 */
+	public void setCursorPosition(int[] cursorPosition) {
+		this.setCursorPosition(cursorPosition[0], cursorPosition[1]);
+	}
+
+	/**
+	 * Sets the cursor position in the editor where the first index represents the
+	 * row, the second index represents the index/column and sets the focus.
+	 * 
+	 * @param cursorPosition
+	 * @param focus
+	 */
+	public void setCursorPosition(int[] cursorPosition, boolean focus) {
+		this.setCursorPosition(cursorPosition[0], cursorPosition[1]);
 		if (focus) {
 			this.focus();
 		}

@@ -6,12 +6,12 @@
 
 	<groupId>de.f0rce</groupId>
 	<artifactId>ace</artifactId>
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 	<name>ace</name>
 	<description>Lit-Element Wrapper around the Ace Editor (https://ace.c9.io/) for Vaadin 14+</description>
 
 	<properties>
-		<vaadin.version>14.6.0</vaadin.version>
+		<vaadin.version>14.6.1</vaadin.version>
 
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>

@@ -8,8 +8,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 import { LitElement, html, css } from "lit-element";
 
-import * as ace from "ace-builds";
-import "ace-builds/webpack-resolver.js";
+import "ace-builds/src-noconflict/ace.js";
+import "ace-builds/src-noconflict/ext-language_tools.js";
+import "ace-builds/src-noconflict/ext-static_highlight.js";
 
 class LitAce extends LitElement {
   static get properties() {
@@ -108,7 +109,7 @@ class LitAce extends LitElement {
         position: absolute;
       }
       .ace_placeholder {
-        color: var(--lumo-shade-50pct) !important;
+        color: #808080 !important;
         font-family: var(--lumo-font-family) !important;
         transform: scale(1) !important;
         opacity: 1 !important;
@@ -132,14 +133,28 @@ class LitAce extends LitElement {
   }
 
   async firstUpdated(changedProperties) {
+    console.log("FIRST UPDATED");
+
+    let baseUrl = "../../ace-builds/src-noconflict/";
+
+    if (!ace) {
+      await import(`${baseUrl}ace.js`);
+    }
+
+    if (!ace.require("ace/ext/language_tools")) {
+      await import(`${baseUrl}ext-language_tools.js`);
+    }
+
+    if (!ace.require("ace/ext/static_highlight")) {
+      await import(`${baseUrl}ext-static_highlight.js`);
+    }
+
     this.editorDiv = this.shadowRoot.getElementById("editor");
     this.editorContainerDiv = this.shadowRoot.getElementById("editorContainer");
 
     this.editor = ace.edit(this.editorDiv);
     this.editor.langTools = ace.require("ace/ext/language_tools");
     this.editor.staticHighlight = ace.require("ace/ext/static_highlight");
-
-    console.log(Object.keys(this.editor.$options));
 
     let self = this;
     this.observer = new ResizeObserver(function (entries) {
@@ -154,9 +169,12 @@ class LitAce extends LitElement {
   }
 
   updated(changedProperties) {
+    console.log("UPDATED");
     changedProperties.forEach((oldValue, propName) => {
+      console.log(propName);
       let funcToCall = propName + "Changed";
       if (typeof this[funcToCall] == "function") {
+        // This line if fucking epic
         this[funcToCall]();
       }
     });
@@ -168,14 +186,28 @@ class LitAce extends LitElement {
 
     this.injectStyle("#ace_editor\\.css");
 
+    let baseUrl = `../../ace-builds/src-min-noconflict/`;
+
+    ace.config.set("basePath", baseUrl);
+    ace.config.set("modePath", baseUrl);
+    ace.config.set("themePath", baseUrl);
+    ace.config.set("workerPath", baseUrl);
+
     this.editorValue = "";
     this._selection = this.selection;
     this._cursorPosition = this.cursorPosition;
 
+    // blur
     editor.on("blur", () => this.editorBlurChangeAction());
-    editor.selection.on("changeSelection", () =>
-      this.updateSelectionAction(true)
-    );
+
+    // selection change (with simple debounce)
+    var selectionTimeoutId = false;
+    editor.selection.on("changeSelection", () => {
+      clearTimeout(selectionTimeoutId);
+      selectionTimeoutId = setTimeout(() => {
+        this.updateSelectionAction(true);
+      }, 250);
+    });
 
     if (this.initialFocus) {
       this.editor.focus();
@@ -223,6 +255,7 @@ class LitAce extends LitElement {
     if (this.editor == undefined) {
       return;
     }
+
     this.editor.setTheme("ace/theme/" + this.theme);
   }
 
@@ -334,6 +367,9 @@ class LitAce extends LitElement {
 
     const Range = ace.require("ace/range").Range;
     this.editor.selection.setRange(new Range(rowStart, from, rowEnd, to));
+
+    const set = rowFrom + "|" + from + "|" + rowEnd + "|" + to + "|-";
+    this._selection = set;
   }
 
   customAutoCompletionChanged() {
@@ -459,19 +495,21 @@ class LitAce extends LitElement {
   }
 
   editorBlurChangeAction() {
+    console.log("BLUR EVENT");
     this.updateSelectionAction(false);
     this.dispatchEvent(
       new CustomEvent("editor-blur", {
         detail: {
           value: this.editorValue,
-          selection: this.selection,
-          cursorPosition: this.cursorPosition,
+          selection: this._selection,
+          cursorPosition: this._cursorPosition,
         },
       })
     );
   }
 
   updateSelectionAction(sendEvent) {
+    console.log("WE UPDATING SELECTION");
     const range = this.editor.selection.getRange();
     const rowFrom = String(range.start.row);
     const from = String(range.start.column);
@@ -488,6 +526,7 @@ class LitAce extends LitElement {
     this._cursorPosition = row + "|" + column + "|-";
 
     if (sendEvent == true) {
+      console.log("gonna send the event");
       this.dispatchEvent(
         new CustomEvent("editor-selection", {
           detail: {
@@ -498,9 +537,6 @@ class LitAce extends LitElement {
         })
       );
     }
-
-    this.selection = this._selection;
-    this.cursorPosition = this._cursorPosition;
   }
 
   resizeEditor() {

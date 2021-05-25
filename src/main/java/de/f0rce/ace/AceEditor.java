@@ -31,14 +31,14 @@ import de.f0rce.ace.util.AceMarker;
 
 @SuppressWarnings("serial")
 @Tag("lit-ace")
-@NpmPackage(value = "@f0rce/lit-ace", version = "1.1.3")
-//@JsModule("@f0rce/lit-ace/lit-ace.js")
+@NpmPackage(value = "@f0rce/lit-ace", version = "1.2.0")
 @JsModule("./@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 		implements HasSize, HasStyle, Focusable<AceEditor> {
 
 	private AceTheme editorTheme = AceTheme.eclipse;
 	private AceMode editorMode = AceMode.javascript;
+	private String baseUrl = "../../ace-builds/src-min-noconflict/";
 	private int fontSize = 14;
 	private boolean softTabs = true;
 	private int tabSize = 4;
@@ -152,6 +152,28 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	public AceTheme getTheme() {
 		return this.editorTheme;
 	};
+
+	/**
+	 * Sets the baseUrl for the editor. BaseUrl contains the path to the themes and
+	 * modes. If you want to add your own custom modes / themes make sure to place
+	 * them under <b>src/main/resources/META-INF/resources</b> and make sure to
+	 * start your BaseUrl with ../../yourDirectory/...
+	 * 
+	 * @param baseUrl {@link String}
+	 */
+	public void setBaseUrl(String baseUrl) {
+		getElement().setProperty("baseUrl", baseUrl);
+		this.baseUrl = baseUrl;
+	}
+
+	/**
+	 * Returns the current set baseUrl.
+	 * 
+	 * @return {@link String}
+	 */
+	public String getBaseUrl() {
+		return this.baseUrl;
+	}
 
 	/**
 	 * Clears the value contained in the editor.
@@ -577,8 +599,8 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	 * Sets the cursor position in the editor where the first index represents the
 	 * row, the second index represents the index/column and sets the focus.
 	 * 
-	 * @param cursorPosition
-	 * @param focus
+	 * @param cursorPosition int[]
+	 * @param focus          boolean
 	 */
 	public void setCursorPosition(int[] cursorPosition, boolean focus) {
 		this.setCursorPosition(cursorPosition[0], cursorPosition[1]);
@@ -1026,17 +1048,29 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 		getElement().callJsFunction("focusEditor");
 	}
 
+	/**
+	 * Run an action after the sync has completed to ensure the values you want to
+	 * use are up to date with the server.
+	 * 
+	 * @param action {@link Runnable}
+	 */
 	public void runAfterSync(Runnable action) {
 		Objects.requireNonNull(action);
 		addListener(AceForceSyncDomEvent.class, event -> runAfterSync(event, action));
 		sync();
 	}
 
+	// unregister event and run action (private)
 	private void runAfterSync(AceForceSyncDomEvent event, Runnable action) {
 		event.unregisterListener();
 		action.run();
 	}
 
+	/**
+	 * Returns the selected text (if text is selected).
+	 * 
+	 * @return {@link String}
+	 */
 	public String getSelectedText() {
 		return this.selectedText;
 	}

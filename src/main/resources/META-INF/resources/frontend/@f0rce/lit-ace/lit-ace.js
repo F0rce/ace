@@ -18,6 +18,7 @@ class LitAce extends LitElement {
       theme: { type: String, reflect: true },
       mode: { type: String, reflect: true },
       value: { type: String },
+      baseUrl: { type: String },
       readonly: { type: Boolean },
       softtabs: { type: Boolean },
       wrap: { type: Boolean },
@@ -47,6 +48,7 @@ class LitAce extends LitElement {
     super();
     this.theme = "eclipse";
     this.mode = "javascript";
+    this.baseUrl = "../../ace-builds/src-min-noconflict/";
     this.readonly = false;
     this.softtabs = true;
     this.wrap = false;
@@ -133,20 +135,18 @@ class LitAce extends LitElement {
   }
 
   async firstUpdated(changedProperties) {
-    console.log("FIRST UPDATED");
-
-    let baseUrl = "../../ace-builds/src-noconflict/";
+    let importPath = "../../ace-builds/src-noconflict/";
 
     if (!ace) {
-      await import(`${baseUrl}ace.js`);
+      await import(`${importPath}ace.js`);
     }
 
     if (!ace.require("ace/ext/language_tools")) {
-      await import(`${baseUrl}ext-language_tools.js`);
+      await import(`${importPath}ext-language_tools.js`);
     }
 
     if (!ace.require("ace/ext/static_highlight")) {
-      await import(`${baseUrl}ext-static_highlight.js`);
+      await import(`${importPath}ext-static_highlight.js`);
     }
 
     this.editorDiv = this.shadowRoot.getElementById("editor");
@@ -169,9 +169,7 @@ class LitAce extends LitElement {
   }
 
   updated(changedProperties) {
-    console.log("UPDATED");
     changedProperties.forEach((oldValue, propName) => {
-      console.log(propName);
       let funcToCall = propName + "Changed";
       if (typeof this[funcToCall] == "function") {
         // This line if fucking epic
@@ -186,12 +184,10 @@ class LitAce extends LitElement {
 
     this.injectStyle("#ace_editor\\.css");
 
-    let baseUrl = `../../ace-builds/src-min-noconflict/`;
-
-    ace.config.set("basePath", baseUrl);
-    ace.config.set("modePath", baseUrl);
-    ace.config.set("themePath", baseUrl);
-    ace.config.set("workerPath", baseUrl);
+    ace.config.set("basePath", this.baseUrl);
+    ace.config.set("modePath", this.baseUrl);
+    ace.config.set("themePath", this.baseUrl);
+    ace.config.set("workerPath", this.baseUrl);
 
     this.editorValue = "";
     this._selection = this.selection;
@@ -200,7 +196,7 @@ class LitAce extends LitElement {
     // blur
     editor.on("blur", () => this.editorBlurChangeAction());
 
-    // selection change (with simple debounce)
+    // selection change (with simple debounce) - 250ms delay
     var selectionTimeoutId = false;
     editor.selection.on("changeSelection", () => {
       clearTimeout(selectionTimeoutId);
@@ -490,12 +486,11 @@ class LitAce extends LitElement {
     const row = parseInt(cursorPosition[0]);
     const column = parseInt(cursorPosition[1]);
 
-    this.editor.moveCursorTo(row, column);
+    this.editor.gotoLine(row, column);
     this.editorBlurChangeAction();
   }
 
   editorBlurChangeAction() {
-    console.log("BLUR EVENT");
     this.updateSelectionAction(false);
     this.dispatchEvent(
       new CustomEvent("editor-blur", {
@@ -509,7 +504,6 @@ class LitAce extends LitElement {
   }
 
   updateSelectionAction(sendEvent) {
-    console.log("WE UPDATING SELECTION");
     const range = this.editor.selection.getRange();
     const rowFrom = String(range.start.row);
     const from = String(range.start.column);
@@ -526,7 +520,6 @@ class LitAce extends LitElement {
     this._cursorPosition = row + "|" + column + "|-";
 
     if (sendEvent == true) {
-      console.log("gonna send the event");
       this.dispatchEvent(
         new CustomEvent("editor-selection", {
           detail: {
@@ -573,13 +566,71 @@ class LitAce extends LitElement {
 
     for (let i = 0; i < split.length; i++) {
       let totalLength;
-      if (i == split.length - 1) {
-        totalLength = split[i].length + 1;
-      } else if (i == 0) {
-        totalLength = split[i].length + rowLengthObject[i - 1].totalLength;
-      } else {
-        totalLength = split[i].length + 1 + rowLengthObject[i - 1].totalLength;
+      if (i === 0) {
+        totalLength = split[i].length + 1; // +1 for \n
+        rowLengthObject.push({
+          row: i + 1,
+          totalLength: totalLength,
+        });
+        continue;
       }
+      totalLength = split[i].length + 1 + rowLengthObject[i - 1].totalLength;
+      if (i === split.length - 1) totalLength--; // last line has no \n
+
+      rowLengthObject.push({
+        row: i + 1,
+        totalLength: totalLength,
+      });
+    }
+
+    for (let i = 0; i < rowLengthObject.length; i++) {
+      if (rowLengthObject.length === 1) {
+        this.editor.gotoLine(rowLengthObject[i].row, split[i].length);
+        this.editorBlurChangeAction();
+        return;
+      }
+      let currentLength = rowLengthObject[i].totalLength;
+      if (i === 0) {
+        if (index <= currentLength) {
+          this.editor.gotoLine(rowLengthObject[i].row, index);
+          this.editorBlurChangeAction();
+          return;
+        }
+        continue;
+      }
+      if (i === rowLengthObject.length - 1) {
+        this.editor.gotoLine(rowLengthObject[i].row, split[i].length);
+        this.editorBlurChangeAction();
+        return;
+      }
+      if (index <= currentLength) {
+        this.editor.gotoLine(
+          rowLengthObject[i].row,
+          index - rowLengthObject[i - 1].totalLength
+        );
+        this.editorBlurChangeAction();
+        return;
+      }
+    }
+  }
+
+  calculateSelectionByIndices(from, to) {
+    var currentValue = this.editorValue;
+    var split = currentValue.split("\n");
+    var rowLengthObject = [];
+
+    for (let i = 0; i < split.length; i++) {
+      let totalLength;
+      if (i === 0) {
+        totalLength = split[i].length + 1; // +1 for \n
+        rowLengthObject.push({
+          row: i,
+          totalLength: totalLength,
+        });
+        continue;
+      }
+      totalLength = split[i].length + 1 + rowLengthObject[i - 1].totalLength;
+      if (i === split.length - 1) totalLength--; // last line has no \n
 
       rowLengthObject.push({
         row: i,
@@ -587,24 +638,41 @@ class LitAce extends LitElement {
       });
     }
 
+    const Range = ace.require("ace/range").Range;
+    var rowFrom = 0,
+      fromC = from,
+      rowTo = 0,
+      toC = to;
+
     for (let i = 0; i < rowLengthObject.length; i++) {
-      if (rowLengthObject.length == 1) {
-        this.editor.moveCursorTo(rowLengthObject[i].row, index);
+      if (rowLengthObject.length === 1) {
+        this.editor.selection.setRange(new Range(rowFrom, from, rowTo, to));
         this.editorBlurChangeAction();
         return;
       }
       let currentLength = rowLengthObject[i].totalLength;
-      if (i == rowLengthObject.length - 1) {
-        this.editor.moveCursorTo(rowLengthObject[i].row, currentLength - index);
-        this.editorBlurChangeAction();
-        return;
+      if (i === 0) {
+        if (from <= currentLength && to <= currentLength) {
+          this.editor.selection.setRange(new Range(rowFrom, from, rowTo, to));
+          this.editorBlurChangeAction();
+          return;
+        }
+        continue;
       }
-      let nextLength = rowLengthObject[i + 1].totalLength;
-      if (index >= currentLength && index <= nextLength) {
-        this.editor.moveCursorTo(
-          rowLengthObject[i + 1].row,
-          index - currentLength
-        );
+      if (from <= currentLength) {
+        if (fromC === from) {
+          rowFrom = rowLengthObject[i].row;
+          fromC = from - rowLengthObject[i - 1].totalLength;
+        }
+      }
+      if (to <= currentLength) {
+        if (toC === to) {
+          rowTo = rowLengthObject[i].row;
+          toC = to - rowLengthObject[i - 1].totalLength;
+        }
+      }
+      if (i === rowLengthObject.length - 1) {
+        this.editor.selection.setRange(new Range(rowFrom, fromC, rowTo, toC));
         this.editorBlurChangeAction();
         return;
       }
@@ -682,6 +750,18 @@ class LitAce extends LitElement {
           );
         });
     }
+  }
+
+  unfold() {
+    this.editor.getSession().unfold();
+  }
+
+  foldAll() {
+    this.editor.getSession().foldAll();
+  }
+
+  foldAll(startRow) {
+    this.editor.getSession().foldAll(startRow);
   }
 
   /**

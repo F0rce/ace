@@ -31,7 +31,7 @@ import de.f0rce.ace.util.AceMarker;
 
 @SuppressWarnings("serial")
 @Tag("lit-ace")
-@NpmPackage(value = "@f0rce/lit-ace", version = "1.2.0")
+@NpmPackage(value = "@f0rce/lit-ace", version = "1.2.1")
 @JsModule("./@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 		implements HasSize, HasStyle, Focusable<AceEditor> {
@@ -92,6 +92,7 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	// lost focus)
 	private void updateEditor(AceBlurChanged event) {
 		updateSelection(event);
+		this.setValue(event.getValue());
 	};
 
 	// Updates the private variables to ensure that client and server are up to date
@@ -501,6 +502,22 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 			this.focus();
 		}
 	};
+
+	/**
+	 * Sets the selection via two indices and the frontend calculates the rowFrom
+	 * and the rowTo from it.
+	 * 
+	 * @param from int
+	 * @param to   int
+	 */
+	public void setSelection(int from, int to) {
+		if (to < from) {
+			int tmp = from;
+			from = to;
+			to = tmp;
+		}
+		getElement().callJsFunction("calculateSelectionByIndices", from, to);
+	}
 
 	/**
 	 * Returns an int array of the current selection where the first index
@@ -1075,4 +1092,28 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 		return this.selectedText;
 	}
 
+	/**
+	 * Folds all fold marker in the editor. (Created automatically when an if is
+	 * added for example).
+	 */
+	public void foldAll() {
+		getElement().callJsFunction("foldAll");
+	}
+
+	/**
+	 * Folds all fold marker in the editor from a specific line downwards. (Created
+	 * automatically when an if is added for example).
+	 * 
+	 * @param startRow int
+	 */
+	public void foldAll(int startRow) {
+		getElement().callJsFunction("foldAll", startRow);
+	}
+
+	/**
+	 * Unfolds all fold marker in the editor.
+	 */
+	public void unfold() {
+		getElement().callJsFunction("unfold");
+	}
 }

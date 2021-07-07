@@ -188,8 +188,7 @@
 					</supportedPackagings>
 					<webAppConfig>
 						<resourceBases>
-							<baseResource> src/main/resources/META-INF/resources
-							</baseResource>
+							<resourceBase>src/main/resources/META-INF/resources</resourceBase>
 						</resourceBases>
 					</webAppConfig>
 				</configuration>

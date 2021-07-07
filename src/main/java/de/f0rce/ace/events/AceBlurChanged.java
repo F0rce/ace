@@ -19,12 +19,14 @@ public class AceBlurChanged extends ComponentEvent<AceEditor> {
 	private int selectionFrom;
 	private int selectionRowEnd;
 	private int selectionTo;
+	private String selectedText;
 	private int cursorRow;
 	private int cursorColumn;
 
 	public AceBlurChanged(AceEditor source, boolean fromClient, @EventData("event.detail.value") String value,
 			@EventData("event.detail.selection") String selectionValue,
-			@EventData("event.detail.cursorPosition") String cursorPosition) {
+			@EventData("event.detail.cursorPosition") String cursorPosition,
+			@EventData("event.detail.selectedText") String selectedText) {
 		super(source, fromClient);
 		this.value = value;
 		String[] splitSelection = selectionValue.split("\\|");
@@ -32,6 +34,7 @@ public class AceBlurChanged extends ComponentEvent<AceEditor> {
 		this.selectionFrom = Integer.parseInt(splitSelection[1]);
 		this.selectionRowEnd = Integer.parseInt(splitSelection[2]);
 		this.selectionTo = Integer.parseInt(splitSelection[3]);
+		this.selectedText = selectedText;
 
 		String[] splitCursor = cursorPosition.split("\\|");
 		this.cursorRow = Integer.parseInt(splitCursor[0]);
@@ -81,6 +84,15 @@ public class AceBlurChanged extends ComponentEvent<AceEditor> {
 	 */
 	public int getSelectionTo() {
 		return selectionTo;
+	}
+
+	/**
+	 * Returns the selected text.
+	 * 
+	 * @return {@link String}
+	 */
+	public String getSelectedText() {
+		return selectedText;
 	}
 
 	/**

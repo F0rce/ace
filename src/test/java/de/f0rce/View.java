@@ -80,6 +80,12 @@ public class View extends VerticalLayout {
 		aceEditor.setHighlightSelectedWord(false);
 		aceEditor.setPlaceholder("DIES IST EIN TEST OB DER NEUE PLACEHOLDER FUNKTIONIERT");
 		aceEditor.setMinHeight("300px");
+
+		aceEditor.addSelectionChangeListener(event -> {
+			System.out.println(event.getSelectionRowStart() + " " + event.getSelectionFrom() + " "
+					+ event.getSelectionRowEnd() + " " + event.getSelectionTo());
+			System.out.println(event.getCursorRow() + " " + event.getCursorColumn());
+		});
 //
 //		aceEditor.addFocusListener(e -> {
 //		 System.out.println("Focus");
@@ -90,8 +96,9 @@ public class View extends VerticalLayout {
 
 		Button button = new Button("demo");
 		Button button2 = new Button("rm custom");
+		Button button3 = new Button("ok");
 
-		aceLayout.add(layoutComboBoxes, aceEditor, button, button2);
+		aceLayout.add(layoutComboBoxes, aceEditor, button, button2, button3);
 
 		aceLayout.expand(aceEditor);
 		contextMenu.setTarget(aceEditor);
@@ -114,10 +121,13 @@ public class View extends VerticalLayout {
 		});
 
 		button.addClickListener(event -> {
-			aceEditor.focus();
+			aceEditor.foldAll();
 		});
 		button2.addClickListener(event -> {
-			aceEditor.disableCustomAutoCompletion();
+			aceEditor.foldAll(3);
+		});
+		button3.addClickListener(event -> {
+			aceEditor.unfold();
 		});
 
 		Shortcuts.addShortcutListener(aceEditor, event -> {

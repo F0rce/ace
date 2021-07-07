@@ -48,7 +48,7 @@ class LitAce extends LitElement {
     super();
     this.theme = "eclipse";
     this.mode = "javascript";
-    this.baseUrl = "../../ace-builds/src-min-noconflict/";
+    this.baseUrl = "/ace-builds/src-min-noconflict/";
     this.readonly = false;
     this.softtabs = true;
     this.wrap = false;
@@ -135,18 +135,16 @@ class LitAce extends LitElement {
   }
 
   async firstUpdated(changedProperties) {
-    let importPath = "../../ace-builds/src-noconflict/";
-
     if (!ace) {
-      await import(`${importPath}ace.js`);
+      await import("ace-builds/src-noconflict/ace");
     }
 
     if (!ace.require("ace/ext/language_tools")) {
-      await import(`${importPath}ext-language_tools.js`);
+      await import("ace-builds/src-noconflict/ext-language_tools");
     }
 
     if (!ace.require("ace/ext/static_highlight")) {
-      await import(`${importPath}ext-static_highlight.js`);
+      await import("ace-builds/src-noconflict/ext-static_highlight");
     }
 
     this.editorDiv = this.shadowRoot.getElementById("editor");
@@ -172,7 +170,7 @@ class LitAce extends LitElement {
     changedProperties.forEach((oldValue, propName) => {
       let funcToCall = propName + "Changed";
       if (typeof this[funcToCall] == "function") {
-        // This line if fucking epic
+        // This line if freaking epic
         this[funcToCall]();
       }
     });
@@ -498,6 +496,7 @@ class LitAce extends LitElement {
           value: this.editorValue,
           selection: this._selection,
           cursorPosition: this._cursorPosition,
+          selectedText: this.editor.getSelectedText(),
         },
       })
     );

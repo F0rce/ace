@@ -6,7 +6,7 @@ import com.vaadin.flow.component.EventData;
 
 @SuppressWarnings("serial")
 @DomEvent("force-sync")
-class AceForceSyncDomEvent extends ComponentEvent<AceEditor> {
+public class AceForceSyncDomEvent extends ComponentEvent<AceEditor> {
 
 	private String value;
 	private String selectedText;

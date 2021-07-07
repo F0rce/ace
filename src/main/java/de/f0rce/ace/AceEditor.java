@@ -38,7 +38,7 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 
 	private AceTheme editorTheme = AceTheme.eclipse;
 	private AceMode editorMode = AceMode.javascript;
-	private String baseUrl = "../../ace-builds/src-min-noconflict/";
+	private String baseUrl = "/ace-builds/src-min-noconflict/";
 	private int fontSize = 14;
 	private boolean softTabs = true;
 	private int tabSize = 4;
@@ -97,6 +97,7 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 
 	// Updates the private variables to ensure that client and server are up to date
 	private void updateSelection(AceBlurChanged event) {
+		this.selectedText = event.getSelectedText();
 		this.cursorPosition = new int[] { event.getCursorRow(), event.getCursorColumn() };
 		this.selection = new int[] { event.getSelectionRowStart(), event.getSelectionFrom(), event.getSelectionRowEnd(),
 				event.getSelectionTo() };

@@ -239,10 +239,18 @@ class LitAce extends LitElement {
       enableLiveAutocompletion: this.enableLiveAutocompletion,
       placeholder: this.placeholder,
     });
+
+    this.dispatchEvent(new Event("editorInitialized"));
   }
 
   focusEditor() {
-    this.editor.focus();
+    if (this.editor == undefined) {
+      this.addEventListener("editorInitialized", (e) => this.editor.focus(), {
+        once: true,
+      });
+    } else {
+      this.editor.focus();
+    }
   }
 
   themeChanged() {
@@ -559,6 +567,18 @@ class LitAce extends LitElement {
   }
 
   calculateCursorPositionFromIndex(index) {
+    if (this.editor == undefined) {
+      this.addEventListener(
+        "editorInitialized",
+        (e) => this._calculateCursorPositionFromIndex(index),
+        { once: true }
+      );
+    } else {
+      this._calculateCursorPositionFromIndex(index);
+    }
+  }
+
+  _calculateCursorPositionFromIndex(index) {
     var currentValue = this.editorValue;
     var split = currentValue.split("\n");
     var rowLengthObject = [];
@@ -614,6 +634,18 @@ class LitAce extends LitElement {
   }
 
   calculateSelectionByIndices(from, to) {
+    if (this.editor == undefined) {
+      this.addEventListener(
+        "editorInitialized",
+        (e) => this._calculateSelectionByIndices(from, to),
+        { once: true }
+      );
+    } else {
+      this._calculateSelectionByIndices(from, to);
+    }
+  }
+
+  _calculateSelectionByIndices(from, to) {
     var currentValue = this.editorValue;
     var split = currentValue.split("\n");
     var rowLengthObject = [];
@@ -679,6 +711,18 @@ class LitAce extends LitElement {
   }
 
   replaceTextAtSelection(text) {
+    if (this.editor == undefined) {
+      this.addEventListener(
+        "editorInitialized",
+        (e) => this._replaceTextAtSelection(text),
+        { once: true }
+      );
+    } else {
+      this._replaceTextAtSelection(text);
+    }
+  }
+
+  _replaceTextAtSelection(text) {
     this.editor.session.replace(this.editor.selection.getRange(), text);
     this.editorBlurChangeAction();
   }

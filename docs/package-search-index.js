@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"de.f0rce.ace.enums"},{"l":"de.f0rce.ace.events"},{"l":"de.f0rce.ace.util"}]
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"de.f0rce.ace"},{"l":"de.f0rce.ace.enums"},{"l":"de.f0rce.ace.events"},{"l":"de.f0rce.ace.util"}]

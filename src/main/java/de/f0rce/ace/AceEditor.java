@@ -31,7 +31,7 @@ import de.f0rce.ace.util.AceMarker;
 
 @SuppressWarnings("serial")
 @Tag("lit-ace")
-@NpmPackage(value = "@f0rce/lit-ace", version = "1.2.1")
+@NpmPackage(value = "@f0rce/lit-ace", version = "1.2.2")
 @JsModule("./@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 		implements HasSize, HasStyle, Focusable<AceEditor> {

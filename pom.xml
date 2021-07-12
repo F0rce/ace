@@ -6,7 +6,7 @@
 
 	<groupId>de.f0rce</groupId>
 	<artifactId>ace</artifactId>
-	<version>1.2.2</version>
+	<version>1.2.3</version>
 	<name>ace</name>
 	<description>Lit-Element Wrapper around the Ace Editor (https://ace.c9.io/) for Vaadin 14+</description>
 

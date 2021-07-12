@@ -31,14 +31,14 @@ import de.f0rce.ace.util.AceMarker;
 
 @SuppressWarnings("serial")
 @Tag("lit-ace")
-@NpmPackage(value = "@f0rce/lit-ace", version = "1.2.2")
+@NpmPackage(value = "@f0rce/lit-ace", version = "1.2.3")
 @JsModule("./@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 		implements HasSize, HasStyle, Focusable<AceEditor> {
 
 	private AceTheme editorTheme = AceTheme.eclipse;
 	private AceMode editorMode = AceMode.javascript;
-	private String baseUrl = "/ace-builds/src-min-noconflict/";
+	private String baseUrl = "ace-builds/src-min-noconflict/";
 	private int fontSize = 14;
 	private boolean softTabs = true;
 	private int tabSize = 4;

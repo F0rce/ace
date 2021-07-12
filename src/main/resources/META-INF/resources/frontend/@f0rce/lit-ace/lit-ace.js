@@ -48,7 +48,7 @@ class LitAce extends LitElement {
     super();
     this.theme = "eclipse";
     this.mode = "javascript";
-    this.baseUrl = "/ace-builds/src-min-noconflict/";
+    this.baseUrl = "ace-builds/src-min-noconflict/";
     this.readonly = false;
     this.softtabs = true;
     this.wrap = false;

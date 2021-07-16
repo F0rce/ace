@@ -31,7 +31,7 @@ import de.f0rce.ace.util.AceMarker;
 
 @SuppressWarnings("serial")
 @Tag("lit-ace")
-@NpmPackage(value = "@f0rce/lit-ace", version = "1.2.3")
+@NpmPackage(value = "@f0rce/lit-ace", version = "1.3.0")
 @JsModule("./@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 		implements HasSize, HasStyle, Focusable<AceEditor> {
@@ -61,6 +61,7 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	private String[] customAutoCompletion = new String[0];
 	private List<AceMarker> markers = new ArrayList<AceMarker>();
 	private String selectedText = "";
+	private boolean statusbarEnabled = true;
 
 	public AceEditor() {
 		super("value", "", false);
@@ -1116,5 +1117,32 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	 */
 	public void unfold() {
 		getElement().callJsFunction("unfold");
+	}
+
+	/**
+	 * Beautifies the current code.
+	 */
+	public void beautify() {
+		getElement().callJsFunction("beautify");
+	}
+
+	/**
+	 * Enables the statusbar which is displayed at the bottom right of the ace
+	 * editor to let the user see current cursor position and selection.
+	 * 
+	 * @param statusbarEnabled boolean
+	 */
+	public void setStatusbarEnabled(boolean statusbarEnabled) {
+		getElement().setProperty("statusbarEnabled", statusbarEnabled);
+		this.statusbarEnabled = statusbarEnabled;
+	}
+
+	/**
+	 * Returns if the statusbar is enabled or not.
+	 * 
+	 * @return boolean
+	 */
+	public boolean isStatusbarEnabled() {
+		return statusbarEnabled;
 	}
 }

@@ -11,6 +11,8 @@ import { LitElement, html, css } from "lit-element";
 import "ace-builds/src-noconflict/ace.js";
 import "ace-builds/src-noconflict/ext-language_tools.js";
 import "ace-builds/src-noconflict/ext-static_highlight.js";
+import "ace-builds/src-noconflict/ext-beautify.js";
+import "ace-builds/src-noconflict/ext-statusbar.js";
 
 class LitAce extends LitElement {
   static get properties() {
@@ -41,6 +43,7 @@ class LitAce extends LitElement {
       markerList: { type: Array },
       rmMarker: { type: String },
       cursorPosition: { type: String },
+      statusbarEnabled: { type: Boolean },
     };
   }
 
@@ -71,6 +74,7 @@ class LitAce extends LitElement {
     this.markerList = { markers: [] };
     this.rmMarker = "";
     this.cursorPosition = "0|0|-";
+    this.statusbarEnabled = true;
   }
 
   static get styles() {
@@ -84,6 +88,26 @@ class LitAce extends LitElement {
         border: 1px solid var(--lumo-contrast-20pct);
         border-radius: var(--lumo-border-radius);
         @apply --ace-widget-editor;
+      }
+      #editorStatusbar {
+        z-index: 9;
+        position: absolute;
+        right: 4px;
+        bottom: 4px;
+        color: grey;
+      }
+      .ace_status-indicator {
+        background-color: hsla(214, 57%, 24%, 0.08);
+        text-align: right;
+        border: 1px solid hsla(214, 57%, 24%, 0.08);
+        border-radius: 7px;
+        padding-right: 3px;
+        padding-left: 3px;
+        padding-bottom: 1px;
+        font-size: small;
+      }
+      .hide_statusbar {
+        display: none;
       }
       .ace_marker-layer .green {
         background-color: var(--lumo-success-color);
@@ -130,6 +154,7 @@ class LitAce extends LitElement {
           id="editor"
           style="position: absolute; top: 0; right: 0; bottom: 0; left: 0;"
         ></div>
+        <div id="editorStatusbar"></div>
       </div>
     `;
   }
@@ -147,12 +172,23 @@ class LitAce extends LitElement {
       await import("ace-builds/src-noconflict/ext-static_highlight");
     }
 
+    if (!ace.require("ace/ext/beautify")) {
+      await import("ace-builds/src-noconflict/ext-beautify");
+    }
+
+    if (!ace.require("ace/ext/statusbar")) {
+      await import("ace-builds/src-noconflict/ext-statusbar");
+    }
+
     this.editorDiv = this.shadowRoot.getElementById("editor");
     this.editorContainerDiv = this.shadowRoot.getElementById("editorContainer");
+    this.editorStatusbarDiv = this.shadowRoot.getElementById("editorStatusbar");
 
     this.editor = ace.edit(this.editorDiv);
     this.editor.langTools = ace.require("ace/ext/language_tools");
     this.editor.staticHighlight = ace.require("ace/ext/static_highlight");
+    this.editor.beautify = ace.require("ace/ext/beautify");
+    this.statusBar = ace.require("ace/ext/statusbar").StatusBar;
 
     let self = this;
     this.observer = new ResizeObserver(function (entries) {
@@ -214,8 +250,10 @@ class LitAce extends LitElement {
 
     editor.setShowPrintMargin(this.showPrintMargin);
     editor.setShowInvisibles(this.showInvisibles);
-    editor.setDisplayIndentGuides(this.displayIndentGuides);
     editor.getSession().setUseWorker(this.useWorker);
+
+    editor.renderer.setShowGutter(this.showGutter);
+    editor.renderer.setOption("displayIndentGuides", this.displayIndentGuides);
 
     // Setting content
 
@@ -234,11 +272,31 @@ class LitAce extends LitElement {
 
     editor.setOptions({
       autoScrollEditorIntoView: true,
-      showGutter: this.showGutter,
       enableBasicAutocompletion: this.enableAutocompletion,
       enableLiveAutocompletion: this.enableLiveAutocompletion,
       placeholder: this.placeholder,
     });
+
+    this.editor.statusbar = new this.statusBar(
+      this.editor,
+      this.editorStatusbarDiv
+    );
+
+    this.vScrollbarObserver = new IntersectionObserver(
+      this._vScrollbarHandler.bind(this),
+      { root: null }
+    );
+    this.vScrollbarObserver.observe(
+      this.shadowRoot.querySelector(".ace_scrollbar-v")
+    );
+
+    this.hScrollbarObserver = new IntersectionObserver(
+      this._hScrollbarHandler.bind(this),
+      { root: null }
+    );
+    this.hScrollbarObserver.observe(
+      this.shadowRoot.querySelector(".ace_scrollbar-h")
+    );
 
     this.dispatchEvent(new Event("editorInitialized"));
   }
@@ -257,7 +315,6 @@ class LitAce extends LitElement {
     if (this.editor == undefined) {
       return;
     }
-
     this.editor.setTheme("ace/theme/" + this.theme);
   }
 
@@ -350,6 +407,71 @@ class LitAce extends LitElement {
     }
 
     this.editor.setHighlightSelectedWord(this.highlightSelectedWord);
+  }
+
+  showPrintMarginChanged() {
+    if (this.editor == undefined) {
+      return;
+    }
+
+    this.editor.setShowPrintMargin(this.showPrintMargin);
+  }
+
+  showInvisiblesChanged() {
+    if (this.editor == undefined) {
+      return;
+    }
+
+    this.editor.setShowInvisibles(this.showInvisibles);
+  }
+
+  displayIndentGuidesChanged() {
+    if (this.editor == undefined) {
+      return;
+    }
+
+    this.editor.renderer.setOption(
+      "displayIndentGuides",
+      this.displayIndentGuides
+    );
+  }
+
+  enableAutocompletionChanged() {
+    if (this.editor == undefined) {
+      return;
+    }
+
+    this.editor.setOption(
+      "enableBasicAutocompletion",
+      this.enableAutocompletion
+    );
+  }
+
+  enableLiveAutocompletionChanged() {
+    if (this.editor == undefined) {
+      return;
+    }
+
+    this.editor.setOption(
+      "enableBasicAutocompletion",
+      this.enableLiveAutocompletion
+    );
+  }
+
+  placeholderChanged() {
+    if (this.editor == undefined) {
+      return;
+    }
+
+    this.editor.setOption("placeholder", this.placeholder);
+  }
+
+  showGutterChanged() {
+    if (this.editor == undefined) {
+      return;
+    }
+
+    this.editor.renderer.setShowGutter(this.showGutter);
   }
 
   selectionChanged() {
@@ -494,6 +616,18 @@ class LitAce extends LitElement {
 
     this.editor.gotoLine(row, column);
     this.editorBlurChangeAction();
+  }
+
+  statusbarEnabledChanged() {
+    if (this.editor == undefined) {
+      return;
+    }
+
+    if (this.statusbarEnabled) {
+      this.editorStatusbarDiv.classList.remove("hide_statusbar");
+    } else {
+      this.editorStatusbarDiv.classList.add("hide_statusbar");
+    }
   }
 
   editorBlurChangeAction() {
@@ -805,6 +939,28 @@ class LitAce extends LitElement {
 
   foldAll(startRow) {
     this.editor.getSession().foldAll(startRow);
+  }
+
+  beautify() {
+    this.editor.beautify.beautify(this.editor.session);
+  }
+
+  _vScrollbarHandler() {
+    var vScrollbar = this.shadowRoot.querySelector(".ace_scrollbar-v");
+    if (vScrollbar.style.display === "none") {
+      this.editorStatusbarDiv.style.right = "6px";
+    } else {
+      this.editorStatusbarDiv.style.right = "24px";
+    }
+  }
+
+  _hScrollbarHandler() {
+    var hScrollbar = this.shadowRoot.querySelector(".ace_scrollbar-h");
+    if (hScrollbar.style.display === "none") {
+      this.editorStatusbarDiv.style.bottom = "6px";
+    } else {
+      this.editorStatusbarDiv.style.bottom = "24px";
+    }
   }
 
   /**

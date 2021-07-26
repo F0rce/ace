@@ -12,6 +12,10 @@ Vaadin widget - [Ace](http://ace.c9.io/) - The High Performance Code Editor
 
 > Frontend is based on [lit-ace](https://npmjs.com/package/@f0rce/lit-ace) created by myself 
 
+## Preview and Demo
+
+[preview.f0rce.de/ace](https://preview.f0rce.de/ace)
+
 
 ## Install
 

@@ -8,11 +8,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 import { LitElement, html, css } from "lit-element";
 
-import "ace-builds/src-noconflict/ace.js";
-import "ace-builds/src-noconflict/ext-language_tools.js";
-import "ace-builds/src-noconflict/ext-static_highlight.js";
-import "ace-builds/src-noconflict/ext-beautify.js";
-import "ace-builds/src-noconflict/ext-statusbar.js";
+import "@f0rce/ace-builds/src-noconflict/ace.js";
+import "@f0rce/ace-builds/src-noconflict/ext-language_tools.js";
+import "@f0rce/ace-builds/src-noconflict/ext-static_highlight.js";
+import "@f0rce/ace-builds/src-noconflict/ext-beautify.js";
+import "@f0rce/ace-builds/src-noconflict/ext-statusbar.js";
 
 class LitAce extends LitElement {
   static get properties() {
@@ -90,16 +90,16 @@ class LitAce extends LitElement {
         @apply --ace-widget-editor;
       }
       #editorStatusbar {
-        z-index: 9;
-        position: absolute;
+        z-index: 9 !important;
+        position: absolute !important;
         right: 4px;
         bottom: 4px;
-        color: grey;
       }
       .ace_status-indicator {
-        background-color: hsla(214, 57%, 24%, 0.08);
+        background-color: #4e4e4e;
+        color: white;
         text-align: right;
-        border: 1px solid hsla(214, 57%, 24%, 0.08);
+        border: 1px solid #292929;
         border-radius: 7px;
         padding-right: 3px;
         padding-left: 3px;
@@ -161,23 +161,23 @@ class LitAce extends LitElement {
 
   async firstUpdated(changedProperties) {
     if (!ace) {
-      await import("ace-builds/src-noconflict/ace");
+      await import("@f0rce/ace-builds/src-noconflict/ace");
     }
 
     if (!ace.require("ace/ext/language_tools")) {
-      await import("ace-builds/src-noconflict/ext-language_tools");
+      await import("@f0rce/ace-builds/src-noconflict/ext-language_tools");
     }
 
     if (!ace.require("ace/ext/static_highlight")) {
-      await import("ace-builds/src-noconflict/ext-static_highlight");
+      await import("@f0rce/ace-builds/src-noconflict/ext-static_highlight");
     }
 
     if (!ace.require("ace/ext/beautify")) {
-      await import("ace-builds/src-noconflict/ext-beautify");
+      await import("@f0rce/ace-builds/src-noconflict/ext-beautify");
     }
 
     if (!ace.require("ace/ext/statusbar")) {
-      await import("ace-builds/src-noconflict/ext-statusbar");
+      await import("@f0rce/ace-builds/src-noconflict/ext-statusbar");
     }
 
     this.editorDiv = this.shadowRoot.getElementById("editor");
@@ -948,7 +948,7 @@ class LitAce extends LitElement {
   _vScrollbarHandler() {
     var vScrollbar = this.shadowRoot.querySelector(".ace_scrollbar-v");
     if (vScrollbar.style.display === "none") {
-      this.editorStatusbarDiv.style.right = "6px";
+      this.editorStatusbarDiv.style.right = "4px";
     } else {
       this.editorStatusbarDiv.style.right = "24px";
     }
@@ -957,7 +957,7 @@ class LitAce extends LitElement {
   _hScrollbarHandler() {
     var hScrollbar = this.shadowRoot.querySelector(".ace_scrollbar-h");
     if (hScrollbar.style.display === "none") {
-      this.editorStatusbarDiv.style.bottom = "6px";
+      this.editorStatusbarDiv.style.bottom = "4px";
     } else {
       this.editorStatusbarDiv.style.bottom = "24px";
     }

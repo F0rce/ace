@@ -19,7 +19,7 @@ needed to provide [Ace](http://ace.c9.io/) - The High Performance Code Editor
 
 ## Install
 
-Install the component using [npm](https://www.npmjs.com/):
+Install the component using [npm](https://www.npmjs.com/package/@f0rce/lit-ace):
 
 ```sh
 $ npm i @f0rce/lit-ace --save

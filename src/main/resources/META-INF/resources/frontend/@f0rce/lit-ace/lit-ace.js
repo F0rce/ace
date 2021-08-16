@@ -96,15 +96,16 @@ class LitAce extends LitElement {
         bottom: 4px;
       }
       .ace_status-indicator {
-        background-color: #4e4e4e;
-        color: white;
-        text-align: right;
-        border: 1px solid #292929;
-        border-radius: 7px;
+        background-color: var(--las-background-color, #777);
+        color: var(--las-color, white);
+        text-align: center;
+        border: none;
+        border-radius: var(--las-border-radius, 7px);
         padding-right: 3px;
         padding-left: 3px;
         padding-bottom: 1px;
         font-size: small;
+        opacity: 0.9;
       }
       .hide_statusbar {
         display: none;
@@ -950,7 +951,11 @@ class LitAce extends LitElement {
     if (vScrollbar.style.display === "none") {
       this.editorStatusbarDiv.style.right = "4px";
     } else {
-      this.editorStatusbarDiv.style.right = "24px";
+      let width = vScrollbar.offsetWidth - vScrollbar.clientWidth;
+      if (width === undefined || width === null) {
+        width = 20;
+      }
+      this.editorStatusbarDiv.style.right = width + 4 + "px";
     }
   }
 
@@ -959,7 +964,11 @@ class LitAce extends LitElement {
     if (hScrollbar.style.display === "none") {
       this.editorStatusbarDiv.style.bottom = "4px";
     } else {
-      this.editorStatusbarDiv.style.bottom = "24px";
+      let height = hScrollbar.offsetHeight - hScrollbar.clientHeight;
+      if (height === undefined || height === null) {
+        height = 20;
+      }
+      this.editorStatusbarDiv.style.bottom = height + 4 + "px";
     }
   }
 

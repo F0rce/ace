@@ -20,6 +20,7 @@ import de.f0rce.ace.enums.AceMarkerColor;
 import de.f0rce.ace.enums.AceMode;
 import de.f0rce.ace.enums.AceTheme;
 import de.f0rce.ace.events.AceBlurChanged;
+import de.f0rce.ace.events.AceForceSyncDomEvent;
 import de.f0rce.ace.events.AceForceSyncEvent;
 import de.f0rce.ace.events.AceHTMLGeneratedEvent;
 import de.f0rce.ace.events.AceSelectionChanged;
@@ -31,7 +32,7 @@ import de.f0rce.ace.util.AceMarker;
 
 @SuppressWarnings("serial")
 @Tag("lit-ace")
-@NpmPackage(value = "@f0rce/lit-ace", version = "1.3.1")
+@NpmPackage(value = "@f0rce/lit-ace", version = "1.3.2")
 @JsModule("./@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 		implements HasSize, HasStyle, Focusable<AceEditor> {
@@ -1144,5 +1145,32 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	 */
 	public boolean isStatusbarEnabled() {
 		return statusbarEnabled;
+	}
+
+	/**
+	 * Set the css text color of the statusbar.
+	 * 
+	 * @param textColor {@link String}
+	 */
+	public void setStatusbarTextColor(String textColor) {
+		getElement().getStyle().set("--las-color", textColor);
+	}
+
+	/**
+	 * Set the css background color of the statusbar.
+	 * 
+	 * @param backgroundColor {@link String}
+	 */
+	public void setStatusbarBackgroundColor(String backgroundColor) {
+		getElement().getStyle().set("--las-background-color", backgroundColor);
+	}
+
+	/**
+	 * Set the css border radius of the statusbar.
+	 * 
+	 * @param borderRadius double
+	 */
+	public void setStatusbarBorderRadius(String borderRadius) {
+		getElement().getStyle().set("--las-border-radius", borderRadius);
 	}
 }

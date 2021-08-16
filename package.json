@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@f0rce/lit-ace": "1.3.1",
+    "@f0rce/lit-ace": "1.3.2",
     "@polymer/iron-icon": "3.0.1",
     "@polymer/iron-list": "3.1.0",
     "@polymer/polymer": "3.2.0",
@@ -64,7 +64,7 @@
   "name": "no-name",
   "vaadin": {
     "dependencies": {
-      "@f0rce/lit-ace": "1.3.1",
+      "@f0rce/lit-ace": "1.3.2",
       "@polymer/iron-icon": "3.0.1",
       "@polymer/iron-list": "3.1.0",
       "@polymer/polymer": "3.2.0",
@@ -124,6 +124,6 @@
       "webpack-dev-server": "3.11.0",
       "webpack-merge": "4.2.2"
     },
-    "hash": "669d6c847363580154c28d7d29ba73700a7a0f94a1f94a839c977190057b3ec0"
+    "hash": "4b19ced59d5ff9f0ceb39756d6cb5353aed0d8a9acf95d4617722fdd4f022230"
   }
 }

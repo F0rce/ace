@@ -2,6 +2,7 @@ package de.f0rce;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Shortcuts;
@@ -158,7 +159,7 @@ public class View extends VerticalLayout {
 		grid.setWidth("500px");
 
 		grid.addItemDoubleClickListener(event -> {
-			if (event.getItem().getAppname() == "Ace Editor") {
+			if (Objects.equals(event.getItem().getAppname(), "Ace Editor")) {
 				aceDialog.open();
 			}
 		});

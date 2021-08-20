@@ -19,7 +19,12 @@ import com.vaadin.flow.shared.Registration;
 import de.f0rce.ace.enums.AceMarkerColor;
 import de.f0rce.ace.enums.AceMode;
 import de.f0rce.ace.enums.AceTheme;
-import de.f0rce.ace.events.*;
+import de.f0rce.ace.events.AceBlurChanged;
+import de.f0rce.ace.events.AceChanged;
+import de.f0rce.ace.events.AceForceSyncDomEvent;
+import de.f0rce.ace.events.AceForceSyncEvent;
+import de.f0rce.ace.events.AceHTMLGeneratedEvent;
+import de.f0rce.ace.events.AceSelectionChanged;
 import de.f0rce.ace.util.AceMarker;
 
 /**
@@ -28,7 +33,7 @@ import de.f0rce.ace.util.AceMarker;
 
 @SuppressWarnings("serial")
 @Tag("lit-ace")
-@NpmPackage(value = "@f0rce/lit-ace", version = "1.3.2")
+@NpmPackage(value = "@f0rce/lit-ace", version = "1.3.3")
 @JsModule("./@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 		implements HasSize, HasStyle, Focusable<AceEditor> {
@@ -1043,8 +1048,8 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	}
 
 	/**
-	 * Add a listener to the editor, which listens to when the value is changed
-	 * The event is sent for every change in the editor, it could send a lot of data.
+	 * Add a listener to the editor, which listens to when the value is changed The
+	 * event is sent for every change in the editor, it could send a lot of data.
 	 *
 	 * Check {@link AceChanged} for all available returned values.
 	 *
@@ -1054,6 +1059,7 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	public Registration addAceChangedListener(ComponentEventListener<AceChanged> listener) {
 		return addListener(AceChanged.class, listener);
 	}
+
 	/**
 	 * Replaces the current selection with given text.
 	 * 

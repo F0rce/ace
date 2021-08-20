@@ -231,6 +231,9 @@ class LitAce extends LitElement {
     // blur
     editor.on("blur", () => this.editorBlurChangeAction());
 
+    // change -> possibility to allow saving the value without having to wait for blur
+    editor.on("change", () => this.editorChangeAction());
+
     // selection change (with simple debounce) - 250ms delay
     var selectionTimeoutId = false;
     editor.selection.on("changeSelection", () => {
@@ -645,6 +648,16 @@ class LitAce extends LitElement {
     );
   }
 
+  editorChangeAction() {
+    this.dispatchEvent(
+      new CustomEvent("editor-change", {
+        detail: {
+          value: this.editorValue,
+        },
+      })
+    );
+  }
+
   updateSelectionAction(sendEvent) {
     const range = this.editor.selection.getRange();
     const rowFrom = String(range.start.row);
@@ -698,7 +711,7 @@ class LitAce extends LitElement {
   insertText(row, column, text) {
     let positionObject = { row, column };
     this.editor.session.insert(positionObject, text);
-    editorBlurChangeAction();
+    this.editorBlurChangeAction();
   }
 
   calculateCursorPositionFromIndex(index) {
@@ -876,12 +889,12 @@ class LitAce extends LitElement {
 <html>
   <head>
   <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
     <style>
       #aceRaw {
         font-family: 'Source Code Pro', monospace;
         font-size: 12px;
-      }     
+      }
     </style>
   </head>
   <body>
@@ -911,7 +924,7 @@ class LitAce extends LitElement {
 <html>
   <head>
     <style>
-      ${result.css} 
+      ${result.css}
     </style>
   </head>
     <body>

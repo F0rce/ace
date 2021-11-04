@@ -18,6 +18,10 @@ public enum AceMode {
 	razor, rdoc, red, redshift, rhtml, rst, ruby, rust, sass, scad, scala, scheme, scss, sh, sjs, slim, smarty,
 	snippets, soy_template, space, sparql, sql, sqlserver, stylus, svg, swift, tcl, terraform, tex, text, textile, toml,
 	tsx, turtle, twig, typescript, vala, vbscript, velocity, verilog, vhdl, visualforce, wollok, xml, xquery, yaml,
-	zeek;
+	zeek,
+	/**
+	 * Not yet useable. Will be useable with the next update.
+	 */
+	lobster_logs;
 
 }

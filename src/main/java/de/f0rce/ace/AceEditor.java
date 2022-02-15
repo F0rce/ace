@@ -24,6 +24,7 @@ import de.f0rce.ace.events.AceChanged;
 import de.f0rce.ace.events.AceForceSyncDomEvent;
 import de.f0rce.ace.events.AceForceSyncEvent;
 import de.f0rce.ace.events.AceHTMLGeneratedEvent;
+import de.f0rce.ace.events.AceReady;
 import de.f0rce.ace.events.AceSelectionChanged;
 import de.f0rce.ace.util.AceMarker;
 
@@ -1187,4 +1188,14 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
 	public void setStatusbarBorderRadius(String borderRadius) {
 		getElement().getStyle().set("--las-border-radius", borderRadius);
 	}
+  /**
+   * Add a listener to the editor, which listens to when the editor is fully initialized, so every
+   * operation you try to do has an existing editor.
+   *
+   * @param listener {@link ComponentEventListener}
+   * @return {@link Registration}
+   */
+  public Registration addAceReadyListener(ComponentEventListener<AceReady> listener) {
+    return this.addListener(AceReady.class, listener);
+  }
 }

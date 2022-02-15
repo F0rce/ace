@@ -24,10 +24,24 @@ ace.define(
       require("ace/mode/text_highlight_rules").TextHighlightRules;
 
     var LobsterLogsHighlightRules = function () {
-      this.$rules = {
-        start: [
+	  this.$rules = {
+        "start": [
           {
-            token: "keyword.other.unit",
+		    token: "constant.numeric",
+		    regex: "\\d([:.]?(?=\\d))?",
+		  },
+		  {
+		    token: "string",
+		    regex: '("(?=.))',
+		    next: "handleStringDouble"
+		  },
+		  {
+		    token: "string",
+		    regex: "('(?=.))",
+		    next: "handleStringSingle"
+		  },
+          {
+            token: "keyword",
             regex: "(\\[[mM]:(.*?)\\])",
           },
           {
@@ -36,12 +50,80 @@ ace.define(
           },
           {
             token: "constant.language",
-            regex: "([iI]nput)",
+			regex: "([iI]nput\\([^\)]+\\))",
           },
           {
             token: "constant.numeric",
-            regex: "(\\s[rR]esult)",
+            regex: "([rR]esult)",
           },
+		  {
+			token: "invalid",
+			regex: "(\\[[eE]:(.*?)\\])",
+		  },
+		  {
+		    token: "comment",
+		    regex: "([nN]ested [eE]xception [iI]s:)",
+		  },
+		  {
+		    token: "constant.language",
+		    regex: "([fF]ield=(?=(.*?)))",
+		  },
+		  {
+		    token: "constant.language",
+		    regex: "([rR]ecord=(?=(.*?)))",
+		  },
+		  {
+		    token: "constant.language",
+		    regex: "([iI]teration=(?=(.*?)))",
+		  },
+        ],
+        
+        "handleStringDouble": [
+        {
+            "token": "constant.character.escape",
+            "regex": "\\\\."
+        },
+        {
+            "token" : "string",
+            "regex" : '[^"\\\\]+',
+            "merge" : true
+        }, 
+        {
+            "token" : "string",
+            "regex" : "\\\\$",
+            "next"  : "handleString",
+            "merge" : true
+        }, 
+        {
+            "token" : "string",
+            "regex" : "\"|$",
+            "next"  : "start",
+            "merge" : true
+        }   
+        ],
+        
+        "handleStringSingle": [
+        {
+            "token": "constant.character.escape",
+            "regex": "\\\\."
+        },
+        {
+            "token" : "string",
+            "regex" : "[^'\\\\]+",
+            "merge" : true
+        }, 
+        {
+            "token" : "string",
+            "regex" : "\\\\$",
+            "next"  : "handleString",
+            "merge" : true
+        }, 
+        {
+            "token" : "string",
+            "regex" : "'|$",
+            "next"  : "start",
+            "merge" : true
+        }   
         ],
       };
     };

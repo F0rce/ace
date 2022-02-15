@@ -1,6 +1,6 @@
 /**
 @license MIT
-Copyright 2021 David "F0rce" Dodlek
+Copyright 2021-2022 David "F0rce" Dodlek
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -13,6 +13,7 @@ import "@f0rce/ace-builds/src-noconflict/ext-language_tools.js";
 import "@f0rce/ace-builds/src-noconflict/ext-static_highlight.js";
 import "@f0rce/ace-builds/src-noconflict/ext-beautify.js";
 import "@f0rce/ace-builds/src-noconflict/ext-statusbar.js";
+import "@f0rce/ace-builds/src-noconflict/snippets/snippets.js";
 
 class LitAce extends LitElement {
   static get properties() {
@@ -36,14 +37,14 @@ class LitAce extends LitElement {
       highlightActiveLine: { type: Boolean },
       displayIndentGuides: { type: Boolean },
       highlightSelectedWord: { type: Boolean },
-      selection: { type: String },
       useWorker: { type: Boolean },
-      customAutoCompletion: { type: String },
-      marker: { type: String },
-      markerList: { type: Array },
-      rmMarker: { type: String },
-      cursorPosition: { type: String },
+      customAutoCompletion: { type: String }, // use JSON as input
+      marker: { type: String }, // TODO: use JSON as input
+      markerList: { type: Array }, // TODO: use global variable
+      rmMarker: { type: String }, // TODO: use method
       statusbarEnabled: { type: Boolean },
+      enableSnippets: { type: Boolean },
+      dynamicAutocompletion: { type: String },
     };
   }
 
@@ -67,14 +68,13 @@ class LitAce extends LitElement {
     this.highlightActiveLine = true;
     this.displayIndentGuides = false;
     this.highlightSelectedWord = false;
-    this.selection = "0|0|0|0|-";
     this.useWorker = false;
     this.customAutoCompletion = "||";
     this.marker = "-|-|-|-|-|-";
     this.markerList = { markers: [] };
     this.rmMarker = "";
-    this.cursorPosition = "0|0|-";
     this.statusbarEnabled = true;
+    this.enableSnippets = false;
   }
 
   static get styles() {
@@ -181,6 +181,12 @@ class LitAce extends LitElement {
       await import("@f0rce/ace-builds/src-noconflict/ext-statusbar");
     }
 
+    if (!ace.require("ace/snippets")) {
+      await import("@f0rce/ace-builds/src-noconflict/snippets/snippets");
+    }
+
+    this.initialInit = true;
+
     this.editorDiv = this.shadowRoot.getElementById("editor");
     this.editorContainerDiv = this.shadowRoot.getElementById("editorContainer");
     this.editorStatusbarDiv = this.shadowRoot.getElementById("editorStatusbar");
@@ -192,6 +198,12 @@ class LitAce extends LitElement {
     this.statusBar = ace.require("ace/ext/statusbar").StatusBar;
 
     let self = this;
+
+    // when the CSS resize Property is added (to a container-div or lit-ace itself) the correct sizing is maintained (after user resize)
+    document.addEventListener("mouseup", function (e) {
+      self.resizeEditor();
+    });
+
     this.observer = new ResizeObserver(function (entries) {
       entries.forEach(function (entry) {
         self.resizeEditor();
@@ -204,18 +216,28 @@ class LitAce extends LitElement {
   }
 
   updated(changedProperties) {
-    changedProperties.forEach((oldValue, propName) => {
-      let funcToCall = propName + "Changed";
+    for (let i = 0; i < changedProperties.size; i++) {
+      var toUpdate = Array.from(changedProperties.keys())[i];
+      var funcToCall = toUpdate + "Changed";
       if (typeof this[funcToCall] == "function") {
-        // This line if freaking epic
-        this[funcToCall]();
+        this[funcToCall](); // This line is freaking cool
       }
-    });
+      // If last initial property update done, send ready event to ensure every next operation has an existing editor
+      if (i == changedProperties.size - 1) {
+        if (this.initialInit) {
+          this.dispatchEvent(
+            new CustomEvent("editor-ready", {
+              detail: {},
+            })
+          );
+          this.initialInit = false;
+        }
+      }
+    }
   }
 
   initializeEditor() {
     let editor = this.editor;
-    this.head = document.head;
 
     this.injectStyle("#ace_editor\\.css");
 
@@ -225,8 +247,6 @@ class LitAce extends LitElement {
     ace.config.set("workerPath", this.baseUrl);
 
     this.editorValue = "";
-    this._selection = this.selection;
-    this._cursorPosition = this.cursorPosition;
 
     // blur
     editor.on("blur", () => this.editorBlurChangeAction());
@@ -239,7 +259,7 @@ class LitAce extends LitElement {
     editor.selection.on("changeSelection", () => {
       clearTimeout(selectionTimeoutId);
       selectionTimeoutId = setTimeout(() => {
-        this.updateSelectionAction(true);
+        this.updateSelectionAction();
       }, 250);
     });
 
@@ -259,26 +279,15 @@ class LitAce extends LitElement {
     editor.renderer.setShowGutter(this.showGutter);
     editor.renderer.setOption("displayIndentGuides", this.displayIndentGuides);
 
-    // Setting content
-
-    // Trying to get content as HTML content
-    let htmlContent = this.innerHTML.trim();
-    // console.debug("[ace-widget] HTML content found", htmlContent);
-
-    // If we have a value in the `value` attribute, we keep it, else we use the HTML content
-    if (this.value === undefined) {
-      this.value = htmlContent;
-      // console.debug("[ace-widget] initializeEditor - using HTML content as value", this.value)
-    } else {
-      // Forcing a valueChanged() call, because the initial one din't do anything as editor wasn't created yet
-      this.valueChanged();
-    }
+    // Forcing a valueChanged() call, because the initial one din't do anything as editor wasn't created yet
+    this.valueChanged();
 
     editor.setOptions({
       autoScrollEditorIntoView: true,
       enableBasicAutocompletion: this.enableAutocompletion,
       enableLiveAutocompletion: this.enableLiveAutocompletion,
       placeholder: this.placeholder,
+      enableSnippets: this.enableSnippets,
     });
 
     this.editor.statusbar = new this.statusBar(
@@ -301,13 +310,11 @@ class LitAce extends LitElement {
     this.hScrollbarObserver.observe(
       this.shadowRoot.querySelector(".ace_scrollbar-h")
     );
-
-    this.dispatchEvent(new Event("editorInitialized"));
   }
 
   focusEditor() {
     if (this.editor == undefined) {
-      this.addEventListener("editorInitialized", (e) => this.editor.focus(), {
+      this.addEventListener("editor-ready", (e) => this.editor.focus(), {
         once: true,
       });
     } else {
@@ -351,7 +358,6 @@ class LitAce extends LitElement {
     if (this.editor == undefined || value === undefined) {
       return;
     }
-    this._value = value;
     this.editor.setValue(value);
   }
 
@@ -478,28 +484,6 @@ class LitAce extends LitElement {
     this.editor.renderer.setShowGutter(this.showGutter);
   }
 
-  selectionChanged() {
-    if (this.editor == undefined) {
-      return;
-    }
-
-    if (this.selection == "0|0|0|0|-") {
-      return;
-    }
-
-    const selection = this.selection.split("|");
-    const rowStart = parseInt(selection[0]);
-    const from = parseInt(selection[1]);
-    const rowEnd = parseInt(selection[2]);
-    const to = parseInt(selection[3]);
-
-    const Range = ace.require("ace/range").Range;
-    this.editor.selection.setRange(new Range(rowStart, from, rowEnd, to));
-
-    const set = rowFrom + "|" + from + "|" + rowEnd + "|" + to + "|-";
-    this._selection = set;
-  }
-
   customAutoCompletionChanged() {
     if (this.editor == undefined) {
       return;
@@ -521,8 +505,9 @@ class LitAce extends LitElement {
               null,
               wordList.map(function (word) {
                 return {
-                  caption: word,
+                  name: word,
                   value: word,
+                  score: 10,
                   meta: rawSplit[0],
                 };
               })
@@ -538,8 +523,9 @@ class LitAce extends LitElement {
               null,
               wordList.map(function (word) {
                 return {
-                  caption: word,
+                  name: word,
                   value: word,
+                  score: 10,
                   meta: rawSplit[0],
                 };
               })
@@ -634,15 +620,108 @@ class LitAce extends LitElement {
     }
   }
 
+  enableSnippetsChanged() {
+    if (this.editor == undefined) {
+      return;
+    }
+
+    var snippetManager = ace.require("ace/snippets").snippetManager;
+    var snippets = snippetManager.files;
+
+    if (!this.enableSnippets) {
+      this.editor.setOptions({
+        enableSnippets: false,
+      });
+
+      if (snippets) {
+        for (const [name, props] of Object.entries(snippets)) {
+          if (props.snippets) {
+            snippetManager.unregister(props.snippets);
+          }
+        }
+      }
+    } else {
+      this.editor.setOptions({
+        enableSnippets: true,
+      });
+
+      if (snippets) {
+        for (const [name, props] of Object.entries(snippets)) {
+          if (props.snippets) {
+            snippetManager.register(props.snippets);
+          }
+        }
+      }
+    }
+  }
+
+  dynamicAutocompletionChanged() {
+    const parsed = JSON.parse(this.dynamicAutocompletion);
+    const seperator = parsed.seperator;
+    const list = parsed.list;
+    const keys = Object.keys(list);
+    const defaultCallback = keys.map(function (word) {
+      return {
+        name: word,
+        value: word,
+        score: 50,
+        meta: parsed.category,
+      };
+    });
+
+    var dynamicCompletion = {
+      getCompletions: function (editor, session, pos, prefix, callback) {
+        var curLine = session.getDocument().getLine(pos.row);
+        var curTokens = curLine.slice(0, pos.column).split(/\s+/);
+        var curCmd = curTokens[curTokens.length - 1];
+        if (!curCmd) {
+          callback(null, defaultCallback);
+          return;
+        }
+        const seperatorReplaced = seperator.replace(
+          /[-\/\\^$*+?.()|[\]{}]/g,
+          "\\$&"
+        );
+        var canidates = [];
+        const match = curCmd.match(
+          new RegExp(`(${keys.join("|")}){1}(?=${seperatorReplaced})`, "i")
+        );
+        if (match) {
+          const keyword = match[0];
+          for (var option of list[keyword]) {
+            canidates.push(keyword + seperator + option);
+          }
+          callback(
+            null,
+            canidates.map(function (option) {
+              return {
+                name: option,
+                value: option,
+                score: 100,
+                meta: keyword,
+              };
+            })
+          );
+        } else {
+          callback(null, defaultCallback);
+        }
+      },
+    };
+
+    if (parsed.keepcompleters) {
+      this.editor.completers.push(dynamicCompletion);
+    } else {
+      this.editor.completers = [dynamicCompletion];
+    }
+  }
+
   editorBlurChangeAction() {
-    this.updateSelectionAction(false);
     this.dispatchEvent(
       new CustomEvent("editor-blur", {
         detail: {
           value: this.editorValue,
-          selection: this._selection,
-          cursorPosition: this._cursorPosition,
-          selectedText: this.editor.getSelectedText(),
+          selection: this._createSelectionObject(),
+          cursorPosition: this._createCursorObject(),
         },
       })
     );
@@ -658,57 +737,91 @@ class LitAce extends LitElement {
     );
   }
 
-  updateSelectionAction(sendEvent) {
-    const range = this.editor.selection.getRange();
-    const rowFrom = String(range.start.row);
-    const from = String(range.start.column);
-    const rowTo = String(range.end.row);
-    const to = String(range.end.column);
-
-    const set = rowFrom + "|" + from + "|" + rowTo + "|" + to + "|-";
-    this._selection = set;
-
-    const cursorPosition = this.editor.getCursorPosition();
-    const row = String(cursorPosition.row);
-    const column = String(cursorPosition.column);
-
-    this._cursorPosition = row + "|" + column + "|-";
-
-    if (sendEvent == true) {
-      this.dispatchEvent(
-        new CustomEvent("editor-selection", {
-          detail: {
-            selection: this._selection,
-            selectedText: this.editor.getSelectedText(),
-            cursorPosition: this._cursorPosition,
-          },
-        })
-      );
-    }
-  }
-
-  resizeEditor() {
-    if (this.editor == undefined) {
-      return;
-    }
-    this.editor.resize();
-  }
-
-  forceSync() {
-    this.updateSelectionAction(false);
+  updateSelectionAction() {
     this.dispatchEvent(
-      new CustomEvent("force-sync", {
+      new CustomEvent("editor-selection", {
         detail: {
-          value: this.editorValue,
-          selection: this._selection,
-          cursorPosition: this._cursorPosition,
-          selectedText: this.editor.getSelectedText(),
+          selection: this._createSelectionObject(),
+          cursorPosition: this._createCursorObject(),
         },
       })
     );
   }
 
+  forceSync() {
+    this.dispatchEvent(
+      new CustomEvent("force-sync", {
+        detail: {
+          value: this.editorValue,
+          selection: this._createSelectionObject(),
+          cursorPosition: this._createCursorObject(),
+        },
+      })
+    );
+  }
+
+  setSelection(json) {
+    if (this.editor == undefined) {
+      this.addEventListener("editor-ready", () => {
+        this._setSelection(json), { once: true };
+      });
+    } else {
+      this._setSelection(json);
+    }
+  }
+
+  /** @private */
+  _setSelection(json) {
+    const parsed = JSON.parse(json);
+
+    this.editor.selection.setRange(parsed);
+    this.editorBlurChangeAction();
+  }
+
+  setCursorPosition(json) {
+    if (this.editor == undefined) {
+      this.addEventListener("editor-ready", () => {
+        this._setCursorPosition(json), { once: true };
+      });
+    } else {
+      this._setCursorPosition(json);
+    }
+  }
+
+  /** @private */
+  _setCursorPosition(json) {
+    const parsed = JSON.parse(json);
+    this.editor.gotoLine(parsed.row, parsed.column);
+    this.editorBlurChangeAction();
+  }
+
+  resizeEditor() {
+    if (this.editor == undefined) {
+      this.addEventListener("editor-ready", () => {
+        this._resizeEditor(), { once: true };
+      });
+    } else {
+      this._resizeEditor();
+    }
+  }
+
+  /** @private */
+  _resizeEditor() {
+    this.editor.resize();
+  }
+
   insertText(row, column, text) {
+    if (this.editor == undefined) {
+      this.addEventListener("editor-ready", () => {
+        this._insertText(row, column, rext), { once: true };
+      });
+    } else {
+      this._insertText(row, column, text);
+    }
+  }
+
+  /** @private */
+  _insertText(row, column, text) {
     let positionObject = { row, column };
     this.editor.session.insert(positionObject, text);
     this.editorBlurChangeAction();
@@ -717,7 +830,7 @@ class LitAce extends LitElement {
   calculateCursorPositionFromIndex(index) {
     if (this.editor == undefined) {
       this.addEventListener(
-        "editorInitialized",
+        "editor-ready",
         (e) => this._calculateCursorPositionFromIndex(index),
         { once: true }
       );
@@ -726,6 +839,7 @@ class LitAce extends LitElement {
     }
   }
 
+  /** @private */
   _calculateCursorPositionFromIndex(index) {
     var currentValue = this.editorValue;
     var split = currentValue.split("\n");
@@ -784,7 +898,7 @@ class LitAce extends LitElement {
   calculateSelectionByIndices(from, to) {
     if (this.editor == undefined) {
       this.addEventListener(
-        "editorInitialized",
+        "editor-ready",
         (e) => this._calculateSelectionByIndices(from, to),
         { once: true }
       );
@@ -793,6 +907,7 @@ class LitAce extends LitElement {
     }
   }
 
+  /** @private */
   _calculateSelectionByIndices(from, to) {
     var currentValue = this.editorValue;
     var split = currentValue.split("\n");
@@ -861,7 +976,7 @@ class LitAce extends LitElement {
   replaceTextAtSelection(text) {
     if (this.editor == undefined) {
       this.addEventListener(
-        "editorInitialized",
+        "editor-ready",
         (e) => this._replaceTextAtSelection(text),
         { once: true }
       );
@@ -870,12 +985,24 @@ class LitAce extends LitElement {
     }
   }
 
+  /** @private */
   _replaceTextAtSelection(text) {
     this.editor.session.replace(this.editor.selection.getRange(), text);
     this.editorBlurChangeAction();
   }
 
   generateHTML(raw) {
+    if (this.editor == undefined) {
+      this.addEventListener("editor-ready", (e) => this._generateHTML(raw), {
+        once: true,
+      });
+    } else {
+      this._generateHTML(raw);
+    }
+  }
+
+  /** @private */
+  _generateHTML(raw) {
     if (raw == true) {
       let currentVal = this.editorValue;
 
@@ -944,21 +1071,102 @@ class LitAce extends LitElement {
   }
 
   unfold() {
+    if (this.editor == undefined) {
+      this.addEventListener("editor-ready", (e) => this._unfold(), {
+        once: true,
+      });
+    } else {
+      this._unfold();
+    }
+  }
+
+  /** @private */
+  _unfold() {
     this.editor.getSession().unfold();
   }
 
   foldAll() {
+    if (this.editor == undefined) {
+      this.addEventListener("editor-ready", (e) => this._foldAll(), {
+        once: true,
+      });
+    } else {
+      this._foldAll();
+    }
+  }
+
+  /** @private */
+  _foldAll() {
     this.editor.getSession().foldAll();
   }
 
   foldAll(startRow) {
+    if (this.editor == undefined) {
+      this.addEventListener("editor-ready", (e) => this._foldAll(startRow), {
+        once: true,
+      });
+    } else {
+      this._foldAll(startRow);
+    }
+  }
+
+  /** @private */
+  _foldAll(startRow) {
     this.editor.getSession().foldAll(startRow);
   }
 
   beautify() {
+    if (this.editor == undefined) {
+      this.addEventListener("editor-ready", (e) => this._beautify(), {
+        once: true,
+      });
+    } else {
+      this._beautify();
+    }
+  }
+
+  /** @private */
+  _beautify() {
     this.editor.beautify.beautify(this.editor.session);
   }
 
+  openAutocompletion() {
+    if (this.editor == undefined) {
+      this.addEventListener("editor-ready", () => {
+        this._openAutocompletion(), { once: true };
+      });
+    } else {
+      this._openAutocompletion();
+    }
+  }
+
+  /** @private */
+  _openAutocompletion() {
+    this.editor.execCommand("startAutocomplete");
+  }
+
+  /** @private */
+  _createSelectionObject() {
+    let editor = this.editor;
+    let selectionObject = editor.selection.getRange();
+    selectionObject.index = {
+      start: editor.getSession().doc.positionToIndex(selectionObject.start),
+      end: editor.getSession().doc.positionToIndex(selectionObject.end),
+    };
+    selectionObject.selectedText = editor.getSelectedText();
+    return selectionObject;
+  }
+
+  /** @private */
+  _createCursorObject() {
+    let editor = this.editor;
+    let cursorObject = this.editor.getCursorPosition();
+    let index = editor.getSession().doc.positionToIndex(cursorObject);
+    cursorObject.index = index;
+    return cursorObject;
+  }
+
+  /** @private */
   _vScrollbarHandler() {
     var vScrollbar = this.shadowRoot.querySelector(".ace_scrollbar-v");
     if (vScrollbar.style.display === "none") {
@@ -972,6 +1180,7 @@ class LitAce extends LitElement {
     }
   }
 
+  /** @private */
   _hScrollbarHandler() {
     var hScrollbar = this.shadowRoot.querySelector(".ace_scrollbar-h");
     if (hScrollbar.style.display === "none") {

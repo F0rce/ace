@@ -178,5 +178,6 @@ public enum AceMode {
   yaml,
   zeek,
   lobster_logs,
-  lobster_records;
+  lobster_records,
+  lobster_expert_search;
 }

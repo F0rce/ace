@@ -1,6 +1,7 @@
 package de.f0rce;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.vaadin.flow.component.Key;
@@ -26,159 +27,196 @@ import de.f0rce.ace.enums.AceTheme;
 @Route("")
 public class View extends VerticalLayout {
 
-	public View() {
+  public View() {
 
-		Dialog aceDialog = new Dialog();
+    Dialog aceDialog = new Dialog();
 
-		VerticalLayout aceLayout = new VerticalLayout();
+    VerticalLayout aceLayout = new VerticalLayout();
 
-		HorizontalLayout layoutComboBoxes = new HorizontalLayout();
+    HorizontalLayout layoutComboBoxes = new HorizontalLayout();
 
-		ContextMenu contextMenu = new ContextMenu();
+    ContextMenu contextMenu = new ContextMenu();
 
-		ComboBox<AceTheme> themesComboBox = new ComboBox<>();
-		themesComboBox.setItems(AceTheme.values());
-		themesComboBox.setLabel("Themes");
+    ComboBox<AceTheme> themesComboBox = new ComboBox<>();
+    themesComboBox.setItems(AceTheme.values());
+    themesComboBox.setLabel("Themes");
 
-		ComboBox<AceMode> modesComboBox = new ComboBox<>();
-		modesComboBox.setItems(AceMode.values());
-		modesComboBox.setLabel("Modes");
+    ComboBox<AceMode> modesComboBox = new ComboBox<>();
+    modesComboBox.setItems(AceMode.values());
+    modesComboBox.setLabel("Modes");
 
-		layoutComboBoxes.add(themesComboBox, modesComboBox);
+    layoutComboBoxes.add(themesComboBox, modesComboBox);
 
-		aceLayout.setSizeFull();
+    aceLayout.setSizeFull();
 
-		AceEditor aceEditor = new AceEditor();
-//		aceEditor.setTheme(AceTheme.github);
-//		aceEditor.setMode(AceMode.java);
-		// aceEditor.setFontSize(20);
-		aceEditor.setInitialFocus(true);
-		// aceEditor.setHeight("100%");
-		// aceEditor.setWidth("100%");
+    AceEditor aceEditor = new AceEditor();
+    //		aceEditor.setTheme(AceTheme.github);
+    //		aceEditor.setMode(AceMode.java);
+    // aceEditor.setFontSize(20);
+    // aceEditor.setHeight("100%");
+    // aceEditor.setWidth("100%");
 
-//		aceEditor.setHeight("100%");
-//		aceEditor.setReadOnly(false);
-//		aceEditor.setBasePath();
-//		aceEditor.setHighlightActiveLine(false);
-//		aceEditor.setShowInvisibles(true);
-//		aceEditor.setShowGutter(false);
-//		aceEditor.setShowPrintMargin(false);
-//		aceEditor.setDisplayIndentGuides(false);
-//		aceEditor.setHighlightSelectedWord(false);
-//		aceEditor.setUseWorker(false);
-//		aceEditor.addValueChangeListener(e -> {
-//			System.out.println(aceEditor.getValue());
-//			System.out.println("*****");
-//		});
-//
-//		aceEditor.setSofttabs(false);
-//		aceEditor.setTabSize(25);
-//		aceEditor.setWrap(false);
-//		aceEditor.setMinlines(2);
-//		aceEditor.setMaxlines(10);
-//		aceEditor.setPlaceholder("DEMO");
-		aceEditor.setAutoComplete(true);
-		aceEditor.setHighlightActiveLine(false);
-		aceEditor.setHighlightSelectedWord(false);
-		aceEditor.setStatusbarEnabled(false);
-		aceEditor.setPlaceholder("DIES IST EIN TEST OB DER NEUE PLACEHOLDER FUNKTIONIERT");
-		aceEditor.setMinHeight("300px");
-		aceEditor.setMode(AceMode.java);
-		aceEditor.setStatusbarTextColor("white");
+    //		aceEditor.setHeight("100%");
+    //		aceEditor.setReadOnly(false);
+    //		aceEditor.setBasePath();
+    //		aceEditor.setHighlightActiveLine(false);
+    //		aceEditor.setShowInvisibles(true);
+    //		aceEditor.setShowGutter(false);
+    //		aceEditor.setShowPrintMargin(false);
+    //		aceEditor.setDisplayIndentGuides(false);
+    //		aceEditor.setHighlightSelectedWord(false);
+    //		aceEditor.setUseWorker(false);
+    //		aceEditor.addValueChangeListener(e -> {
+    //			System.out.println(aceEditor.getValue());
+    //			System.out.println("*****");
+    //		});
+    //
+    //		aceEditor.setSofttabs(false);
+    //		aceEditor.setTabSize(25);
+    //		aceEditor.setWrap(false);
+    //		aceEditor.setMinlines(2);
+    //		aceEditor.setMaxlines(10);
+    //		aceEditor.setPlaceholder("DEMO");
+    aceEditor.setAutoComplete(true);
+    aceEditor.setLiveAutocompletion(true);
+    aceEditor.setHighlightActiveLine(false);
+    aceEditor.setHighlightSelectedWord(false);
+    aceEditor.setStatusbarEnabled(false);
+    aceEditor.setPlaceholder("DIES IST EIN TEST OB DER NEUE PLACEHOLDER FUNKTIONIERT");
+    aceEditor.setMinHeight("300px");
+    aceEditor.setMode(AceMode.java);
+    aceEditor.setStatusbarTextColor("white");
 
-		aceEditor.addSelectionChangeListener(event -> {
-			System.out.println(event.getSelectionRowStart() + " " + event.getSelectionFrom() + " "
-					+ event.getSelectionRowEnd() + " " + event.getSelectionTo());
-			System.out.println(event.getCursorRow() + " " + event.getCursorColumn());
-		});
-//
-//		aceEditor.addFocusListener(e -> {
-//		 System.out.println("Focus");
-//		});
+    aceEditor.setCustomAutoCompletion(new String[] {"search(", "test"}, "methods", false);
+    ArrayList<String> list = new ArrayList<>();
+    list.add("encoding");
+    list.add("working");
+    ArrayList<String> l2 = new ArrayList<>();
+    l2.add("data");
+    l2.add("json");
+    ArrayList<String> l3 = new ArrayList<>();
+    l3.add("drinking");
+    l3.add("eating");
+    l3.add("walking");
+    l3.add("driving");
 
-		themesComboBox.setValue(aceEditor.getTheme());
-		modesComboBox.setValue(aceEditor.getMode());
+    LinkedHashMap<String, List<String>> map = new LinkedHashMap<>();
+    map.put("basic", list);
+    map.put("asic", l2);
+    map.put("tree", l2);
+    map.put("going", l3);
 
-		Button button = new Button("demo");
-		Button button2 = new Button("rm custom");
-		Button button3 = new Button("ok");
-		Checkbox cb = new Checkbox(true);
-		cb.setLabel("Show PM");
-		cb.addValueChangeListener(evt -> {
-			// aceEditor.setShowPrintMargin(evt.getValue());
-			if (aceEditor.isStatusbarEnabled()) {
-				aceEditor.setStatusbarEnabled(false);
-			} else {
-				aceEditor.setStatusbarEnabled(true);
-			}
-		});
+    aceEditor.addDynamicAutocompletion(map, ".", "not dynmaic", true);
 
-		aceLayout.add(layoutComboBoxes, aceEditor, button, button2, button3, cb);
+    aceEditor.addFocusListener(
+        evt -> {
+          // aceEditor.openAutocompletion();
+        });
 
-		aceLayout.expand(aceEditor);
-		contextMenu.setTarget(aceEditor);
+    // aceEditor.setCustomAutoCompletion(str);
 
-		Label lbl = new Label("Version 1.3.1");
+    //    aceEditor.addSelectionChangeListener(
+    //        event -> {
+    //          System.out.println(
+    //              event.getSelectionRowStart()
+    //                  + " "
+    //                  + event.getSelectionFrom()
+    //                  + " "
+    //                  + event.getSelectionRowEnd()
+    //                  + " "
+    //                  + event.getSelectionTo());
+    //          System.out.println(event.getCursorRow() + " " + event.getCursorColumn());
+    //        });
+    //
+    //		aceEditor.addFocusListener(e -> {
+    //		 System.out.println("Focus");
+    //		});
 
-		contextMenu.addItem("Version 1.3.1");
+    themesComboBox.setValue(aceEditor.getTheme());
+    modesComboBox.setValue(aceEditor.getMode());
 
-		themesComboBox.addValueChangeListener(event -> {
-			if (!event.isFromClient())
-				return;
+    Button button = new Button("demo");
+    Button button2 = new Button("rm custom");
+    Button button3 = new Button("ok");
+    Checkbox cb = new Checkbox();
+    cb.setLabel("Enable Snippets");
 
-			if (event.getValue() != null) {
-				aceEditor.setTheme(event.getValue());
-			}
-		});
+    aceLayout.add(layoutComboBoxes, aceEditor, button, button2, button3, cb);
 
-		modesComboBox.addValueChangeListener(event -> {
-			if (event.getValue() != null) {
-				aceEditor.setMode(event.getValue());
-			}
-		});
+    aceLayout.expand(aceEditor);
+    contextMenu.setTarget(aceEditor);
 
-		button.addClickListener(event -> {
-			aceEditor.beautify();
-		});
-		button2.addClickListener(event -> {
-			aceEditor.foldAll(3);
-		});
-		button3.addClickListener(event -> {
-			aceEditor.unfold();
-		});
+    Label lbl = new Label("Version 1.3.1");
 
-		Shortcuts.addShortcutListener(aceEditor, event -> {
-			aceEditor.addSyncCompletedListener(evt -> {
-				// current cursor position
-			});
-			aceEditor.sync();
+    contextMenu.addItem("Version 1.3.1");
 
-		}, Key.ARROW_RIGHT).listenOn(aceEditor);
+    themesComboBox.addValueChangeListener(
+        event -> {
+          if (!event.isFromClient()) {
+            return;
+          }
 
-		aceEditor.addHTMLGeneratedListener(event -> {
-			System.out.println(event.getHTML());
-		});
+          if (event.getValue() != null) {
+            aceEditor.setTheme(event.getValue());
+          }
+        });
 
-		aceDialog.setHeight("1000px");
-		aceDialog.setWidth("2000px");
-		aceDialog.setCloseOnEsc(true);
-		aceDialog.setResizable(true);
-		aceDialog.add(aceLayout);
+    modesComboBox.addValueChangeListener(
+        event -> {
+          if (event.getValue() != null) {
+            aceEditor.setMode(event.getValue());
+          }
+        });
 
-		List<Apps> appList = new ArrayList<>();
-		appList.add(new Apps("Ace Editor", "v1.0.0"));
-		appList.add(new Apps("Test", "v1.0"));
+    button.addClickListener(event -> {});
 
-		Grid<Apps> grid = new Grid<>(Apps.class);
-		grid.setItems(appList);
+    button2.addClickListener(
+        event -> {
+          aceEditor.setCursorPosition(15);
+        });
+    button3.addClickListener(
+        event -> {
+          aceEditor.unfold();
+        });
 
-		grid.setWidth("500px");
+    Shortcuts.addShortcutListener(
+            aceEditor,
+            event -> {
+              aceEditor.addSyncCompletedListener(
+                  evt -> {
+                    // current cursor position
+                  });
+              aceEditor.sync();
+            },
+            Key.ARROW_RIGHT)
+        .listenOn(aceEditor);
 
-		grid.addItemDoubleClickListener(event -> {
-			if (event.getItem().getAppname() == "Ace Editor") {
-				aceDialog.open();
-			}
-		});
-		add(grid);
-	}
+    aceEditor.addHTMLGeneratedListener(
+        event -> {
+          System.out.println(event.getHTML());
+        });
+
+    aceDialog.setHeight("1000px");
+    aceDialog.setWidth("2000px");
+    aceDialog.setCloseOnEsc(true);
+    aceDialog.setResizable(true);
+    aceDialog.add(aceLayout);
+
+    List<Apps> appList = new ArrayList<>();
+    appList.add(new Apps("Ace Editor", "v1.0.0"));
+    appList.add(new Apps("Test", "v1.0"));
+
+    Grid<Apps> grid = new Grid<>(Apps.class);
+    grid.setItems(appList);
+
+    grid.setWidth("500px");
+
+    grid.addItemDoubleClickListener(
+        event -> {
+          if (event.getItem().getAppname() == "Ace Editor") {
+            aceDialog.open();
+          }
+        });
+    this.add(grid);
+  }
 }

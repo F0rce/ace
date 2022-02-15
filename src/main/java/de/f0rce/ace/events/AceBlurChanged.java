@@ -5,112 +5,55 @@ import com.vaadin.flow.component.DomEvent;
 import com.vaadin.flow.component.EventData;
 
 import de.f0rce.ace.AceEditor;
+import de.f0rce.ace.util.AceCursorPosition;
+import de.f0rce.ace.util.AceSelection;
+import elemental.json.JsonObject;
 
-/**
- * @author David "F0rce" Dodlek
- */
-
+/** @author David "F0rce" Dodlek */
 @SuppressWarnings("serial")
 @DomEvent("editor-blur")
 public class AceBlurChanged extends ComponentEvent<AceEditor> {
 
-	private String value;
-	private int selectionRowStart;
-	private int selectionFrom;
-	private int selectionRowEnd;
-	private int selectionTo;
-	private String selectedText;
-	private int cursorRow;
-	private int cursorColumn;
+  private String value;
+  private AceSelection selection;
+  private AceCursorPosition cursorPosition;
 
-	public AceBlurChanged(AceEditor source, boolean fromClient, @EventData("event.detail.value") String value,
-			@EventData("event.detail.selection") String selectionValue,
-			@EventData("event.detail.cursorPosition") String cursorPosition,
-			@EventData("event.detail.selectedText") String selectedText) {
-		super(source, fromClient);
-		this.value = value;
-		String[] splitSelection = selectionValue.split("\\|");
-		this.selectionRowStart = Integer.parseInt(splitSelection[0]);
-		this.selectionFrom = Integer.parseInt(splitSelection[1]);
-		this.selectionRowEnd = Integer.parseInt(splitSelection[2]);
-		this.selectionTo = Integer.parseInt(splitSelection[3]);
-		this.selectedText = selectedText;
+  public AceBlurChanged(
+      AceEditor source,
+      boolean fromClient,
+      @EventData("event.detail.value") String value,
+      @EventData("event.detail.selection") JsonObject selectionObject,
+      @EventData("event.detail.cursorPosition") JsonObject cursorObject) {
+    super(source, fromClient);
+    this.value = value;
+    this.selection = new AceSelection(selectionObject);
+    this.cursorPosition = new AceCursorPosition(cursorObject);
+  }
 
-		String[] splitCursor = cursorPosition.split("\\|");
-		this.cursorRow = Integer.parseInt(splitCursor[0]);
-		this.cursorColumn = Integer.parseInt(splitCursor[1]);
-	}
+  /**
+   * Returns the current value of the editor.
+   *
+   * @return {@link String}
+   */
+  public String getValue() {
+    return this.value;
+  }
 
-	/**
-	 * Returns the current set value for the editor.
-	 * 
-	 * @return {@link String}
-	 */
-	public String getValue() {
-		return value;
-	}
+  /**
+   * Returns the current selection of the editor.
+   *
+   * @return {@link AceSelection}
+   */
+  public AceSelection getSelection() {
+    return this.selection;
+  }
 
-	/**
-	 * Returns the row where the selection starts.
-	 * 
-	 * @return int
-	 */
-	public int getSelectionRowStart() {
-		return selectionRowStart;
-	}
-
-	/**
-	 * Returns the index where the selection starts.
-	 * 
-	 * @return int
-	 */
-	public int getSelectionFrom() {
-		return selectionFrom;
-	}
-
-	/**
-	 * Returns the row where the selection ends.
-	 * 
-	 * @return int
-	 */
-	public int getSelectionRowEnd() {
-		return selectionRowEnd;
-	}
-
-	/**
-	 * Returns the index where the selection ends.
-	 * 
-	 * @return int
-	 */
-	public int getSelectionTo() {
-		return selectionTo;
-	}
-
-	/**
-	 * Returns the selected text.
-	 * 
-	 * @return {@link String}
-	 */
-	public String getSelectedText() {
-		return selectedText;
-	}
-
-	/**
-	 * Returns the row where the cursor is located.
-	 * 
-	 * @return int
-	 */
-	public int getCursorRow() {
-		return cursorRow;
-	}
-
-	/**
-	 * Returns the index/column where the cursor is located.
-	 * 
-	 * @return int
-	 */
-	public int getCursorColumn() {
-		return cursorColumn;
-	}
-
+  /**
+   * Returns the current cursor position of the editor.
+   *
+   * @return {@link AceCursorPosition}
+   */
+  public AceCursorPosition getCursorPosition() {
+    return this.cursorPosition;
+  }
 }

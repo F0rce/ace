@@ -3,109 +3,53 @@ package de.f0rce.ace.events;
 import com.vaadin.flow.component.ComponentEvent;
 
 import de.f0rce.ace.AceEditor;
+import de.f0rce.ace.util.AceCursorPosition;
+import de.f0rce.ace.util.AceSelection;
 
-/**
- * @author David "F0rce" Dodlek
- */
-
+/** @author David "F0rce" Dodlek */
 @SuppressWarnings("serial")
 public class AceForceSyncEvent extends ComponentEvent<AceEditor> {
 
-	private String value;
-	private String selectedText;
-	private int selectionRowStart;
-	private int selectionFrom;
-	private int selectionRowEnd;
-	private int selectionTo;
-	private int cursorRow;
-	private int cursorColumn;
+  private String value;
+  private AceSelection selection;
+  private AceCursorPosition cursorPosition;
 
-	public AceForceSyncEvent(AceEditor source, boolean fromClient, String value, String selectionValue,
-			String selectedText, String cursorPosition) {
-		super(source, fromClient);
-		this.value = value;
-		this.selectedText = selectedText;
-		String[] split = selectionValue.split("\\|");
-		this.selectionRowStart = Integer.parseInt(split[0]);
-		this.selectionFrom = Integer.parseInt(split[1]);
-		this.selectionRowEnd = Integer.parseInt(split[2]);
-		this.selectionTo = Integer.parseInt(split[3]);
+  public AceForceSyncEvent(
+      AceEditor source,
+      boolean fromClient,
+      String value,
+      AceSelection selection,
+      AceCursorPosition cursorPosition) {
+    super(source, fromClient);
+    this.value = value;
+    this.selection = selection;
+    this.cursorPosition = cursorPosition;
+  }
 
-		String[] splitCursor = cursorPosition.split("\\|");
-		this.cursorRow = Integer.parseInt(splitCursor[0]);
-		this.cursorColumn = Integer.parseInt(splitCursor[1]);
-	}
+  /**
+   * Returns the current value of the editor.
+   *
+   * @return {@link String}
+   */
+  public String getValue() {
+    return this.value;
+  }
 
-	/**
-	 * Returns the current set value for the editor.
-	 * 
-	 * @return {@link String}
-	 */
-	public String getValue() {
-		return this.value;
-	}
+  /**
+   * Returns the current selection of the editor.
+   *
+   * @return {@link AceSelection}
+   */
+  public AceSelection getSelection() {
+    return this.selection;
+  }
 
-	/**
-	 * Returns the Text that is selected.
-	 * 
-	 * @return {@link String}
-	 */
-	public String getSelectedText() {
-		return this.selectedText;
-	}
-
-	/**
-	 * Returns the row where the selection starts.
-	 * 
-	 * @return int
-	 */
-	public int getSelectionRowStart() {
-		return selectionRowStart;
-	}
-
-	/**
-	 * Returns the index where the selection starts.
-	 * 
-	 * @return int
-	 */
-	public int getSelectionFrom() {
-		return selectionFrom;
-	}
-
-	/**
-	 * Returns the row where the selection ends.
-	 * 
-	 * @return int
-	 */
-	public int getSelectionRowEnd() {
-		return selectionRowEnd;
-	}
-
-	/**
-	 * Returns the index where the selection ends.
-	 * 
-	 * @return int
-	 */
-	public int getSelectionTo() {
-		return selectionTo;
-	}
-
-	/**
-	 * Returns the row where the cursor is located.
-	 * 
-	 * @return int
-	 */
-	public int getCursorRow() {
-		return cursorRow;
-	}
-
-	/**
-	 * Returns the index/column where the cursor is located.
-	 * 
-	 * @return int
-	 */
-	public int getCursorColumn() {
-		return cursorColumn;
-	}
-
+  /**
+   * Returns the current cursor position of the editor.
+   *
+   * @return {@link AceCursorPosition}
+   */
+  public AceCursorPosition getCursorPosition() {
+    return this.cursorPosition;
+  }
 }

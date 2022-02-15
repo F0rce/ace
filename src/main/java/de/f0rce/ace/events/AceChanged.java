@@ -6,22 +6,24 @@ import com.vaadin.flow.component.EventData;
 
 import de.f0rce.ace.AceEditor;
 
+/** @author Jean-Christophe "jcgueriaud1" Gueriaud */
 @SuppressWarnings("serial")
 @DomEvent("editor-change")
 public class AceChanged extends ComponentEvent<AceEditor> {
-	private String value;
+  private String value;
 
-	public AceChanged(AceEditor source, boolean fromClient, @EventData("event.detail.value") String value) {
-		super(source, fromClient);
-		this.value = value;
-	}
+  public AceChanged(
+      AceEditor source, boolean fromClient, @EventData("event.detail.value") String value) {
+    super(source, fromClient);
+    this.value = value;
+  }
 
-	/**
-	 * Returns the current set value for the editor.
-	 * 
-	 * @return {@link String}
-	 */
-	public String getValue() {
-		return this.value;
-	}
+  /**
+   * Returns the current value of the editor.
+   *
+   * @return {@link String}
+   */
+  public String getValue() {
+    return this.value;
+  }
 }

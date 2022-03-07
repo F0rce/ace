@@ -1283,4 +1283,22 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
   public void openAutocompletion() {
     this.getElement().callJsFunction("openAutocompletion");
   }
+
+  /**
+   * Set the css border of the editor.
+   *
+   * @param border {@link String}
+   */
+  public void setEditorBorder(String border) {
+    this.getElement().getStyle().set("--lae-border", border);
+  }
+
+  /**
+   * Set the css border-radius of the editor.
+   *
+   * @param borderRadius {@link String}
+   */
+  public void setEditorBorderRadius(String borderRadius) {
+    this.getElement().getStyle().set("--lae-border-radius", borderRadius);
+  }
 }

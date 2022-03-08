@@ -1301,4 +1301,27 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
   public void setEditorBorderRadius(String borderRadius) {
     this.getElement().getStyle().set("--lae-border-radius", borderRadius);
   }
+
+  /**
+   * Scroll the editor (the view) to a specific line.
+   *
+   * @param line int
+   */
+  public void scrollToLine(int line) {
+    this.getElement().callJsFunction("scrollToLine", line);
+  }
+
+  /** Scroll the editor (the view) to the end. */
+  public void scrollToEnd() {
+    this.getElement().callJsFunction("scrollToEnd");
+  }
+
+  /**
+   * Finds the first occurance of given text, selects it and scrolls the text (if found) into view.
+   *
+   * @param text {@link String}
+   */
+  public void findAndSelect(String text) {
+    this.getElement().callJsFunction("findAndSelect", text);
+  }
 }

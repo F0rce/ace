@@ -80,7 +80,7 @@ ace.define(
           {
             token: "string",
             regex: "\\\\$",
-            next: "handleString",
+            next: "handleStringDouble",
             merge: true,
           },
           {
@@ -104,7 +104,7 @@ ace.define(
           {
             token: "string",
             regex: "\\\\$",
-            next: "handleString",
+            next: "handleStringSingle",
             merge: true,
           },
           {

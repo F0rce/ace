@@ -3,11 +3,13 @@ ace.define(
   function (require, exports, module) {
     var oop = require("ace/lib/oop");
     var TextMode = require("ace/mode/text").Mode;
+    var Behaviour = require("ace/mode/behaviour/cstyle").CstyleBehaviour;
     var LobsterExpertSearchsHighlightRules =
       require("ace/mode/lobster_expert_search_highlight_rules").LobsterExpertSearchsHighlightRules;
 
     var Mode = function () {
-      this.HighlightRules = LobsterExpertSearchsHighlightRules;
+      this.HighlightRules = LobsterExpertSearchsHighlightRules,
+      this.$behaviour = new Behaviour()
     };
     oop.inherits(Mode, TextMode);
 
@@ -58,7 +60,7 @@ ace.define(
           },
           {
             token: "keyword.operator",
-            regex: "(\\&\\&|\\|\\|)",
+            regex: "(\\&\\&|\\|\\||\\(|\\)|\\!)",
           },
           {
             defaultToken: "text",

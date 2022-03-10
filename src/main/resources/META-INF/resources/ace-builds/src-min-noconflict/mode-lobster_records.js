@@ -19,6 +19,10 @@ ace.define("ace/mode/lobster_records", function (require, exports, module) {
       start: [
         {
           token: "keyword.operator",
+          regex: "Record\\s\\d+",
+        },
+        {
+          token: "text",
           regex: "(\\((?=.+\\)))",
           next: "handleOpeningBrace",
         },
@@ -40,6 +44,18 @@ ace.define("ace/mode/lobster_records", function (require, exports, module) {
           token: "constant",
           regex: "[Ll]ists:|[Mm]aps:|[Vv]ariables:",
         },
+        {
+          token: "support.type",
+          regex: "(MSG_CALL_VAR_SYS_)",
+        },
+        {
+          token: "support.type",
+          regex: "(MSG_CALL_)",
+        },
+        {
+          token: "support.constant",
+          regex: "(VAR_SYS_)",
+        },
       ],
 
       qqstring: [
@@ -55,7 +71,7 @@ ace.define("ace/mode/lobster_records", function (require, exports, module) {
         {
           token: "string",
           regex: '"|$',
-          next: "no_regex",
+          next: "start",
         },
         {
           defaultToken: "string",
@@ -84,34 +100,32 @@ ace.define("ace/mode/lobster_records", function (require, exports, module) {
 
       handleOpeningBrace: [
         {
+          // Timestamp
           token: "constant.numeric",
           regex:
-            "([0-9]{1,4}-[0-9]{1,2}-[0-9]{1,2} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}\\.{0,1}[0-9]*)",
+            "((?<=\\()[0-9]{1,4}-[0-9]{1,2}-[0-9]{1,2}\\s[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}\\.{0,1}[0-9]+(?=\\)))",
           next: "handleClosingBrace",
         },
         {
           token: "constant.numeric",
-          regex: "(-[0-9]+|$)",
-          next: "handleClosingBrace",
-        },
-        {
-          token: "constant.numeric",
-          regex: "([0-9]+|$)",
+          regex: "((?<=\\()-?[0-9]\\d*(?=\\)))",
           next: "handleClosingBrace",
         },
         {
           token: "constant.language",
-          regex: "((false|true)|$)",
+          regex: "((?<=\\()[Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee](?=\\)))",
           next: "handleClosingBrace",
         },
         {
-          defaultToken: "text",
+          token: "constant.language",
+          regex: "(.*(?=\\)))",
+          next: "handleClosingBrace",
         },
       ],
 
       handleClosingBrace: [
         {
-          token: "keyword.operator",
+          token: "text",
           regex: "(\\))",
           next: "start",
         },

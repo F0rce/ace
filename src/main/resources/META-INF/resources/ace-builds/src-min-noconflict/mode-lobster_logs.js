@@ -23,6 +23,15 @@ ace.define(
     var TextHighlightRules =
       require("ace/mode/text_highlight_rules").TextHighlightRules;
 
+    var escapedRe =
+      "\\\\(?:x[0-9a-fA-F]{2}|" + // hex
+      "u[0-9a-fA-F]{4}|" + // unicode
+      "u{[0-9a-fA-F]{1,6}}|" + // es6 unicode
+      "[0-2][0-7]{0,2}|" + // oct
+      "3[0-7][0-7]?|" + // oct
+      "[4-7][0-7]?|" + //oct
+      ".)";
+
     var LobsterLogsHighlightRules = function () {
       this.$rules = {
         start: [
@@ -32,13 +41,13 @@ ace.define(
           },
           {
             token: "string",
-            regex: '("(?=.))',
-            next: "handleStringDouble",
+            regex: "'(?=.)",
+            next: "qstring",
           },
           {
             token: "string",
-            regex: "('(?=.))",
-            next: "handleStringSingle",
+            regex: '"(?=.)',
+            next: "qqstring",
           },
           {
             token: "keyword",
@@ -78,51 +87,43 @@ ace.define(
           },
         ],
 
-        handleStringDouble: [
+        qqstring: [
           {
-            token: "constant.character.escape",
-            regex: "\\\\.",
-          },
-          {
-            token: "string",
-            regex: '[^"\\\\]+',
-            merge: true,
+            token: "constant.language.escape",
+            regex: escapedRe,
           },
           {
             token: "string",
             regex: "\\\\$",
-            next: "handleString",
-            merge: true,
+            consumeLineEnd: true,
           },
           {
             token: "string",
             regex: '"|$',
             next: "start",
-            merge: true,
+          },
+          {
+            defaultToken: "string",
           },
         ],
 
-        handleStringSingle: [
+        qstring: [
           {
-            token: "constant.character.escape",
-            regex: "\\\\.",
-          },
-          {
-            token: "string",
-            regex: "[^'\\\\]+",
-            merge: true,
+            token: "constant.language.escape",
+            regex: escapedRe,
           },
           {
             token: "string",
             regex: "\\\\$",
-            next: "handleString",
-            merge: true,
+            consumeLineEnd: true,
           },
           {
             token: "string",
             regex: "'|$",
             next: "start",
-            merge: true,
+          },
+          {
+            defaultToken: "string",
           },
         ],
       };

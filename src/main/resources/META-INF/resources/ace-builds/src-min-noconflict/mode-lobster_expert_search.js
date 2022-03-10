@@ -8,8 +8,8 @@ ace.define(
       require("ace/mode/lobster_expert_search_highlight_rules").LobsterExpertSearchsHighlightRules;
 
     var Mode = function () {
-      this.HighlightRules = LobsterExpertSearchsHighlightRules,
-      this.$behaviour = new Behaviour()
+      (this.HighlightRules = LobsterExpertSearchsHighlightRules),
+        (this.$behaviour = new Behaviour());
     };
     oop.inherits(Mode, TextMode);
 
@@ -33,18 +33,27 @@ ace.define(
       "search|equals|contains|startswith|endswith|regex".split("|")
     );
     var keywords = lang.arrayToMap("AND|OR".split("|"));
+
+    var escapedRe =
+      "\\\\(?:x[0-9a-fA-F]{2}|" + // hex
+      "u[0-9a-fA-F]{4}|" + // unicode
+      "u{[0-9a-fA-F]{1,6}}|" + // es6 unicode
+      "[0-2][0-7]{0,2}|" + // oct
+      "3[0-7][0-7]?|" + // oct
+      "[4-7][0-7]?|" + //oct
+      ".)";
     var LobsterExpertSearchsHighlightRules = function () {
       this.$rules = {
         start: [
           {
             token: "string",
-            regex: '("(?=.))',
-            next: "handleStringDouble",
+            regex: "'(?=.)",
+            next: "qstring",
           },
           {
             token: "string",
-            regex: "('(?=.))",
-            next: "handleStringSingle",
+            regex: '"(?=.)',
+            next: "qqstring",
           },
           {
             token: function (value) {
@@ -67,51 +76,43 @@ ace.define(
           },
         ],
 
-        handleStringDouble: [
+        qqstring: [
           {
-            token: "constant.character.escape",
-            regex: "\\\\.",
-          },
-          {
-            token: "string",
-            regex: '[^"\\\\]+',
-            merge: true,
+            token: "constant.language.escape",
+            regex: escapedRe,
           },
           {
             token: "string",
             regex: "\\\\$",
-            next: "handleStringDouble",
-            merge: true,
+            consumeLineEnd: true,
           },
           {
             token: "string",
             regex: '"|$',
             next: "start",
-            merge: true,
+          },
+          {
+            defaultToken: "string",
           },
         ],
 
-        handleStringSingle: [
+        qstring: [
           {
-            token: "constant.character.escape",
-            regex: "\\\\.",
-          },
-          {
-            token: "string",
-            regex: "[^'\\\\]+",
-            merge: true,
+            token: "constant.language.escape",
+            regex: escapedRe,
           },
           {
             token: "string",
             regex: "\\\\$",
-            next: "handleStringSingle",
-            merge: true,
+            consumeLineEnd: true,
           },
           {
             token: "string",
             regex: "'|$",
             next: "start",
-            merge: true,
+          },
+          {
+            defaultToken: "string",
           },
         ],
       };

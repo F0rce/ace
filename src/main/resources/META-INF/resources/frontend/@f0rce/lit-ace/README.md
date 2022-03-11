@@ -9,6 +9,14 @@ Even <strong>more</strong> embeddable and lightweight code
 editor Custom Element - just one tag, and no JS 
 needed to provide [Ace](http://ace.c9.io/) - The High Performance Code Editor
 
+## Important Notice ##
+
+This webcomponent has been built to fit and serve the needs of the Vaadin Add-on [Ace](https://vaadin.com/directory/component/ace) (which I created and actively maintain). 
+When using this webcomponent in any other environment, please be carefull because it **only** has been tested in a Vaadin Add-on environment.
+
+*Some methods just don't make sense when using in an non Vaadin environment as most functions depend on JSON input which I create in the Java/Vaadin backend.*
+
+
 ## Usage example
 
 ```html

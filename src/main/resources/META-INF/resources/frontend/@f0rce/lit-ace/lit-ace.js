@@ -85,8 +85,8 @@ class LitAce extends LitElement {
         height: 100%;
       }
       #editor {
-        border: 1px solid var(--lumo-contrast-20pct);
-        border-radius: var(--lumo-border-radius);
+        border: var(--lae-border, 1px solid var(--lumo-contrast-20pct));
+        border-radius: var(--lae-border-radius, var(--lumo-border-radius));
         @apply --ace-widget-editor;
       }
       #editorStatusbar {
@@ -775,6 +775,10 @@ class LitAce extends LitElement {
     const parsed = JSON.parse(json);
 
     this.editor.selection.setRange(parsed);
+
+    let currSelection = this.editor.selection.getRange();
+    this.editor.renderer.scrollCursorIntoView(currSelection.start, 0.5);
+
     this.editorBlurChangeAction();
   }
 
@@ -941,6 +945,9 @@ class LitAce extends LitElement {
     for (let i = 0; i < rowLengthObject.length; i++) {
       if (rowLengthObject.length === 1) {
         this.editor.selection.setRange(new Range(rowFrom, from, rowTo, to));
+
+        let currSelection = this.editor.selection.getRange();
+        this.editor.renderer.scrollCursorIntoView(currSelection.start, 0.5);
         this.editorBlurChangeAction();
         return;
       }
@@ -948,6 +955,9 @@ class LitAce extends LitElement {
       if (i === 0) {
         if (from <= currentLength && to <= currentLength) {
           this.editor.selection.setRange(new Range(rowFrom, from, rowTo, to));
+
+          let currSelection = this.editor.selection.getRange();
+          this.editor.renderer.scrollCursorIntoView(currSelection.start, 0.5);
           this.editorBlurChangeAction();
           return;
         }
@@ -967,6 +977,9 @@ class LitAce extends LitElement {
       }
       if (i === rowLengthObject.length - 1) {
         this.editor.selection.setRange(new Range(rowFrom, fromC, rowTo, toC));
+
+        let currSelection = this.editor.selection.getRange();
+        this.editor.renderer.scrollCursorIntoView(currSelection.start, 0.5);
         this.editorBlurChangeAction();
         return;
       }
@@ -987,6 +1000,7 @@ class LitAce extends LitElement {
 
   /** @private */
   _replaceTextAtSelection(text) {
+    this.editor.renderer.scrollCursorIntoView(this.editor.selection.getRange().start, 0.5);
     this.editor.session.replace(this.editor.selection.getRange(), text);
     this.editorBlurChangeAction();
   }
@@ -1143,6 +1157,56 @@ class LitAce extends LitElement {
   /** @private */
   _openAutocompletion() {
     this.editor.execCommand("startAutocomplete");
+  }
+
+  scrollToLine(line) {
+    if (this.editor == undefined) {
+      this.addEventListener("editor-ready", () => {
+        this._scrollToLine(line), { once: true };
+      });
+    } else {
+      this._scrollToLine(line);
+    }
+  }
+
+  /** @private */
+  _scrollToLine(line) {
+    this.editor.renderer.scrollCursorIntoView({ row: line, column: 1 }, 0.5);
+    this.editorBlurChangeAction();
+  }
+
+  scrollToEnd() {
+    if (this.editor == undefined) {
+      this.addEventListener("editor-ready", () => {
+        this._scrollToEnd(), { once: true };
+      });
+    } else {
+      this._scrollToEnd();
+    }
+  }
+
+  /** @private */
+  _scrollToEnd() {
+    let lastLine = this.editor.getSession().getLength();
+    this.editor.scrollToLine(lastLine);
+  }
+
+  findAndSelect(text) {
+    if (this.editor == undefined) {
+      this.addEventListener("editor-ready", () => {
+        this._findAndSelect(text), { once: true };
+      });
+    } else {
+      this._findAndSelect(text);
+    }
+  }
+
+  /** @private */
+  _findAndSelect(text) {
+    let found = this.editor.find(text);
+    if (found) {
+      this.editor.renderer.scrollCursorIntoView(found.start, 0.5);
+    }
   }
 
   /** @private */

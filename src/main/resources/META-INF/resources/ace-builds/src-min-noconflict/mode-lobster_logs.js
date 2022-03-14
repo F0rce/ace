@@ -36,6 +36,10 @@ ace.define(
       this.$rules = {
         start: [
           {
+            token: "comment",
+            regex: "^\\[.*?\\]",
+          },
+          {
             token: "constant.numeric",
             regex: "\\d([:.]?(?=\\d))?",
           },

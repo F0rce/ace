@@ -20,7 +20,6 @@ class LitAce extends LitElement {
     return {
       theme: { type: String, reflect: true },
       mode: { type: String, reflect: true },
-      value: { type: String },
       baseUrl: { type: String },
       readonly: { type: Boolean },
       softtabs: { type: Boolean },
@@ -246,8 +245,6 @@ class LitAce extends LitElement {
     ace.config.set("themePath", this.baseUrl);
     ace.config.set("workerPath", this.baseUrl);
 
-    this.editorValue = "";
-
     // blur
     editor.on("blur", () => this.editorBlurChangeAction());
 
@@ -279,8 +276,7 @@ class LitAce extends LitElement {
     editor.renderer.setShowGutter(this.showGutter);
     editor.renderer.setOption("displayIndentGuides", this.displayIndentGuides);
 
-    // Forcing a valueChanged() call, because the initial one din't do anything as editor wasn't created yet
-    this.valueChanged();
+    this.editorValue = "";
 
     editor.setOptions({
       autoScrollEditorIntoView: true,
@@ -334,17 +330,6 @@ class LitAce extends LitElement {
       return;
     }
     this.editor.session.setMode("ace/mode/" + this.mode);
-  }
-
-  valueChanged() {
-    if (this.editor == undefined) {
-      return;
-    }
-    if (this.editorValue != this.value) {
-      this.editorValue = this.value;
-      this.editor.clearSelection();
-      this.editor.resize();
-    }
   }
 
   get editorValue() {
@@ -774,10 +759,12 @@ class LitAce extends LitElement {
   _setSelection(json) {
     const parsed = JSON.parse(json);
 
-    this.editor.selection.setRange(parsed);
+    this.editor.selection.setRange(parsed, true);
 
     let currSelection = this.editor.selection.getRange();
-    this.editor.renderer.scrollCursorIntoView(currSelection.start, 0.5);
+    if (currSelection) {
+      this.editor.renderer.scrollCursorIntoView(currSelection.start, 0.5);
+    }
 
     this.editorBlurChangeAction();
   }
@@ -797,6 +784,25 @@ class LitAce extends LitElement {
     const parsed = JSON.parse(json);
     this.editor.gotoLine(parsed.row, parsed.column);
     this.editorBlurChangeAction();
+  }
+
+  setValue(value) {
+    if (this.editor == undefined) {
+      this.addEventListener("editor-ready", () => {
+        this._setValue(value), { once: true };
+      });
+    } else {
+      this._setValue(value);
+    }
+  }
+
+  /** @private */
+  _setValue(value) {
+    if (this.editorValue != value) {
+      this.editorValue = value;
+      this.editor.clearSelection();
+      this.editor.resize();
+    }
   }
 
   resizeEditor() {
@@ -1000,7 +1006,10 @@ class LitAce extends LitElement {
 
   /** @private */
   _replaceTextAtSelection(text) {
-    this.editor.renderer.scrollCursorIntoView(this.editor.selection.getRange().start, 0.5);
+    this.editor.renderer.scrollCursorIntoView(
+      this.editor.selection.getRange().start,
+      0.5
+    );
     this.editor.session.replace(this.editor.selection.getRange(), text);
     this.editorBlurChangeAction();
   }

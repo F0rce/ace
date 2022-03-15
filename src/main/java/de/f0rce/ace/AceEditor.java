@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.vaadin.flow.component.AbstractSinglePropertyField;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.HasSize;
@@ -26,6 +26,7 @@ import de.f0rce.ace.events.AceForceSyncEvent;
 import de.f0rce.ace.events.AceHTMLGeneratedEvent;
 import de.f0rce.ace.events.AceReady;
 import de.f0rce.ace.events.AceSelectionChanged;
+import de.f0rce.ace.events.AceValueChanged;
 import de.f0rce.ace.util.AceCursorPosition;
 import de.f0rce.ace.util.AceJSON;
 import de.f0rce.ace.util.AceMarker;
@@ -34,13 +35,13 @@ import de.f0rce.ace.util.AceSelection;
 /** @author David "F0rce" Dodlek */
 @SuppressWarnings("serial")
 @Tag("lit-ace")
-@NpmPackage(value = "@f0rce/lit-ace", version = "1.5.0")
+@NpmPackage(value = "@f0rce/lit-ace", version = "1.6.0")
 @JsModule("./@f0rce/lit-ace/lit-ace.js")
-public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
-    implements HasSize, HasStyle, Focusable<AceEditor> {
+public class AceEditor extends Component implements HasSize, HasStyle, Focusable<AceEditor> {
 
   private AceTheme theme = AceTheme.eclipse;
   private AceMode mode = AceMode.javascript;
+  private String value = "";
   private String baseUrl = "ace-builds/src-min-noconflict/";
   private int fontSize = 14;
   private boolean softTabs = true;
@@ -66,7 +67,6 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
   private boolean statusbarEnabled = true;
 
   public AceEditor() {
-    super("value", "", false);
     super.addListener(AceBlurChanged.class, this::updateEditor);
     super.addListener(AceForceSyncDomEvent.class, this::onForceSyncDomEvent);
 
@@ -75,7 +75,6 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
   }
 
   public AceEditor(String height, String width) {
-    super("value", "", false);
     super.addListener(AceBlurChanged.class, this::updateEditor);
     super.addListener(AceForceSyncDomEvent.class, this::onForceSyncDomEvent);
 
@@ -84,7 +83,6 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
   }
 
   public AceEditor(AceTheme theme, AceMode mode, String height, String width) {
-    super("value", "", false);
     super.addListener(AceBlurChanged.class, this::updateEditor);
     super.addListener(AceForceSyncDomEvent.class, this::onForceSyncDomEvent);
 
@@ -99,14 +97,20 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
   private void updateEditor(AceBlurChanged event) {
     this.selection = event.getSelection();
     this.cursorPosition = event.getCursorPosition();
-    this.setValue(event.getValue());
+    if (!this.value.equals(event.getValue())) {
+      this.fireEvent(new AceValueChanged(event.getSource(), true, event.getValue()));
+    }
+    this.value = event.getValue();
   }
 
   // Keeps the editor up to date and is backwards compatible
   private void onForceSyncDomEvent(AceForceSyncDomEvent event) {
     this.selection = event.getSelection();
     this.cursorPosition = event.getCursorPosition();
-    this.setValue(event.getValue());
+    if (!this.value.equals(event.getValue())) {
+      this.fireEvent(new AceValueChanged(event.getSource(), true, event.getValue()));
+    }
+    this.value = event.getValue();
 
     this.fireEvent(
         new AceForceSyncEvent(
@@ -178,9 +182,12 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
   }
 
   /** Clears the value of the editor. */
-  @Override
   public void clear() {
-    this.getElement().setProperty("value", "");
+    this.getElement().callJsFunction("setValue", "");
+    if (!this.value.equals("")) {
+      this.fireEvent(new AceValueChanged(this, false, ""));
+    }
+    this.value = "";
   }
 
   /**
@@ -188,9 +195,24 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
    *
    * @param value {@link String}
    */
-  @Override
   public void setValue(String value) {
-    this.getElement().setProperty("value", value);
+    if (value == null) {
+      value = "";
+    }
+    this.getElement().callJsFunction("setValue", value);
+    if (!this.value.equals(value)) {
+      this.fireEvent(new AceValueChanged(this, false, value));
+    }
+    this.value = value;
+  }
+
+  /**
+   * Returns the current set value of the editor.
+   *
+   * @return {@link String}
+   */
+  public String getValue() {
+    return this.value;
   }
 
   /**
@@ -331,7 +353,6 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
    *
    * @param value boolean
    */
-  @Override
   public void setReadOnly(boolean value) {
     this.getElement().setProperty("readonly", value);
     this.readOnly = value;
@@ -342,7 +363,6 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
    *
    * @return boolean
    */
-  @Override
   public boolean isReadOnly() {
     return this.readOnly;
   }

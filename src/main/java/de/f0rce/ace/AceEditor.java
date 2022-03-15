@@ -1324,4 +1324,16 @@ public class AceEditor extends AbstractSinglePropertyField<AceEditor, String>
   public void findAndSelect(String text) {
     this.getElement().callJsFunction("findAndSelect", text);
   }
+
+  /**
+   * Add a listener to the editor, which listens to when the value changed.
+   *
+   * <p>Check {@link AceValueChanged} for all available returned values.
+   *
+   * @param listener {@link ComponentEventListener}
+   * @return {@link Registration}
+   */
+  public Registration addValueChangeListener(ComponentEventListener<AceValueChanged> listener) {
+    return this.addListener(AceValueChanged.class, listener);
+  }
 }

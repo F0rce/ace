@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Focusable;
@@ -90,6 +91,14 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
     this.setMode(mode);
     this.setHeight(height);
     this.setWidth(width);
+  }
+
+  @Override
+  protected void onAttach(AttachEvent attachEvent) {
+    if (!this.value.equals("")) {
+      this.setValue(this.value);
+    }
+    super.onAttach(attachEvent);
   }
 
   // Updates the Text and selection after the Blur event has been fired (Keyboard

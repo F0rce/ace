@@ -18,7 +18,7 @@ public class AceValueChanged extends ComponentEvent<AceEditor> {
   /**
    * Returns the current value of the editor.
    *
-   * @return
+   * @return {@link String}
    */
   public String getValue() {
     return this.value;

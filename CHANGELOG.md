@@ -2,13 +2,6 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [2.0.1](https://github.com/F0rce/ace/compare/v2.0.0...v2.0.1) (2022-03-16)
-
-
-### Bug Fixes
-
-* missing value after reattaching same instance ([c394f49](https://github.com/F0rce/ace/commit/c394f49e4404e17d8c1c4a6f09fb7de4fac8eb3e))
-
 ## 2.0.0 (2022-03-15)
 
 

@@ -81,13 +81,13 @@ public class View extends VerticalLayout {
     aceEditor.setLiveAutocompletion(true);
     aceEditor.setHighlightActiveLine(false);
     aceEditor.setHighlightSelectedWord(false);
-    aceEditor.setStatusbarEnabled(false);
+    aceEditor.setStatusbarEnabled(true);
     aceEditor.setPlaceholder("DIES IST EIN TEST OB DER NEUE PLACEHOLDER FUNKTIONIERT");
     aceEditor.setMinHeight("300px");
     aceEditor.setMode(AceMode.java);
-    aceEditor.setStatusbarTextColor("white");
+    aceEditor.setStatusbarTextColor("red");
 
-    aceEditor.setCustomAutoCompletion(new String[] {"search(", "test"}, "methods", false);
+    // aceEditor.setCustomAutoCompletion(new String[] {"search(", "test"}, "methods", false);
     ArrayList<String> list = new ArrayList<>();
     list.add("encoding");
     list.add("working");
@@ -106,6 +106,19 @@ public class View extends VerticalLayout {
     map.put("tree", l2);
     map.put("going", l3);
 
+    aceEditor.setValue(
+        "\n\n\n\n\n\n\nawdawdawdawdawdawd\n\nawdawdawd\nawdawd\n\naf\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ntest");
+
+    ArrayList<String> custom = new ArrayList<String>();
+    custom.add("JSON");
+    custom.add("ist");
+    custom.add("eine");
+    custom.add("coole");
+    custom.add("Sache");
+
+    aceEditor.setCustomAutocompletion(custom, "JSONTest", false);
+
+    // aceEditor.addCustomAutocompletion(l3, "food", true);
     aceEditor.addDynamicAutocompletion(map, ".", "not dynmaic", true);
 
     aceEditor.addFocusListener(
@@ -172,7 +185,7 @@ public class View extends VerticalLayout {
 
     button2.addClickListener(
         event -> {
-          aceEditor.setCursorPosition(15);
+          aceEditor.disableCustomAutocompletion(false);
         });
     button3.addClickListener(
         event -> {

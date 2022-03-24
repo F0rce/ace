@@ -566,6 +566,45 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   }
 
   /**
+   * Sets the selection of the editor under use of two indices, it can be focused on demand.
+   *
+   * @param startIndex int
+   * @param endIndex int
+   * @param focus boolean
+   */
+  public void setSelection(int startIndex, int endIndex, boolean focus) {
+    this.setSelection(startIndex, endIndex);
+    if (focus) {
+      this.focus();
+    }
+  }
+
+  /**
+   * Sets the selection of the editor under use of {@link AceSelection} (which can be retrieved with
+   * {@link #getSelection()}).
+   *
+   * @param selection {@link AceSelection}
+   */
+  public void setSelection(AceSelection selection) {
+    String json = AceJSON.generateSelectionJSON(selection);
+    this.getElement().callJsFunction("setSelection", json);
+  }
+
+  /**
+   * Sets the selection of the editor under use of {@link AceSelection} (which can be retrieved with
+   * {@link #getSelection()}), it can be focused on demand.
+   *
+   * @param selection {@link AceSelection}
+   * @param focus boolean
+   */
+  public void setSelection(AceSelection selection, boolean focus) {
+    this.setSelection(selection);
+    if (focus) {
+      this.focus();
+    }
+  }
+
+  /**
    * Returns an {@link AceSelection} which contains the current selection values.
    *
    * @return {@link AceSelection}

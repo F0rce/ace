@@ -124,6 +124,33 @@ public class AceJSON {
   }
 
   /**
+   * {@link AceEditor#setSelection(AceSelection)}
+   *
+   * @param selection {@link AceSelection}
+   * @return {@link String}
+   */
+  public static String generateSelectionJSON(AceSelection selection) {
+    StringBuilder builder = new StringBuilder();
+
+    builder.append("{");
+    builder.append(
+        "\"start\": { \"row\": "
+            + selection.getStartRow()
+            + ", \"column\": "
+            + selection.getStartColumn()
+            + " }, ");
+    builder.append(
+        "\"end\": { \"row\": "
+            + selection.getEndRow()
+            + ", \"column\": "
+            + selection.getEndColumn()
+            + " }");
+    builder.append("}");
+
+    return builder.toString();
+  }
+
+  /**
    * {@link AceEditor#setCursorPosition(int, int)}
    *
    * @param row int

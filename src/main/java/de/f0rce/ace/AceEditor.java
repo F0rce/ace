@@ -9,6 +9,7 @@ import java.util.UUID;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.HasStyle;
@@ -67,6 +68,9 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   private List<AceMarker> markers = new ArrayList<AceMarker>();
   private boolean statusbarEnabled = true;
 
+  // Some internal checking
+  private boolean hasBeenDetached = false;
+
   public AceEditor() {
     super.addListener(AceBlurChanged.class, this::updateEditor);
     super.addListener(AceForceSyncDomEvent.class, this::onForceSyncDomEvent);
@@ -95,10 +99,21 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
 
   @Override
   protected void onAttach(AttachEvent attachEvent) {
-    if (!this.value.equals("")) {
-      this.setValue(this.value);
+    // TODO: rework customAutocompletion, dynamicAutocompletion & markers to be refreshed in here
+    // aswell
+    if (this.hasBeenDetached) {
+      if (!this.value.equals("")) {
+        this.setValue(this.value);
+        if (!this.selection.compareTo(new AceSelection())) {
+          this.setSelection(this.selection);
+        }
+      }
     }
-    super.onAttach(attachEvent);
+  }
+
+  @Override
+  protected void onDetach(DetachEvent detachEvent) {
+    this.hasBeenDetached = true;
   }
 
   // Updates the Text and selection after the Blur event has been fired (Keyboard

@@ -169,6 +169,23 @@ public class AceJSON {
   }
 
   /**
+   * {@link AceEditor#setCursorPosition(AceCursorPosition)}
+   *
+   * @param cursorPosition {@link AceCursorPosition}
+   * @return {@link String}
+   */
+  public static String generateCursorPositionJSON(AceCursorPosition cursorPosition) {
+    StringBuilder builder = new StringBuilder();
+
+    builder.append("{");
+    builder.append("\"row\": " + (cursorPosition.getRow() + 1) + ", ");
+    builder.append("\"column\": " + cursorPosition.getColumn());
+    builder.append("}");
+
+    return builder.toString();
+  }
+
+  /**
    * {@link AceEditor#setCustomAutocompletion(List, String, boolean)}
    *
    * @param wordList {@link List}

@@ -684,6 +684,31 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   }
 
   /**
+   * Sets the cursor position of the editor under use of {@link AceCursorPosition} (which can be
+   * retrieved with {@link #getCursorPosition()}).
+   *
+   * @param cursorPosition {@link AceCursorPosition}
+   */
+  public void setCursorPosition(AceCursorPosition cursorPosition) {
+    String json = AceJSON.generateCursorPositionJSON(cursorPosition);
+    this.getElement().callJsFunction("setCursorPosition", json);
+  }
+
+  /**
+   * Sets the cursor position of the editor under use of {@link AceCursorPosition} (which can be
+   * retrieved with {@link #getCursorPosition()}), it can be focused on demand.
+   *
+   * @param cursorPosition {@link AceCursorPosition}
+   * @param focus boolean
+   */
+  public void setCursorPosition(AceCursorPosition cursorPosition, boolean focus) {
+    this.setCursorPosition(cursorPosition);
+    if (focus) {
+      this.focus();
+    }
+  }
+
+  /**
    * Returns an {@link AceCursorPosition} which contains the current cursor position values.
    *
    * @return {@link AceCursorPosition}

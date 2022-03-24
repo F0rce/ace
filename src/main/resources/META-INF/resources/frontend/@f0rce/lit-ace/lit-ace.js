@@ -37,9 +37,9 @@ class LitAce extends LitElement {
       displayIndentGuides: { type: Boolean },
       highlightSelectedWord: { type: Boolean },
       useWorker: { type: Boolean },
-      customAutoCompletion: { type: String }, // use JSON as input
-      marker: { type: String }, // TODO: use JSON as input
-      markerList: { type: Array }, // TODO: use global variable
+      customAutocompletion: { type: String },
+      marker: { type: String }, // TODO: remove this, use markerList instead
+      markerList: { type: Array }, // TODO: kepp this, backend should create a json with all markers
       rmMarker: { type: String }, // TODO: use method
       statusbarEnabled: { type: Boolean },
       enableSnippets: { type: Boolean },
@@ -68,7 +68,6 @@ class LitAce extends LitElement {
     this.displayIndentGuides = false;
     this.highlightSelectedWord = false;
     this.useWorker = false;
-    this.customAutoCompletion = "||";
     this.marker = "-|-|-|-|-|-";
     this.markerList = { markers: [] };
     this.rmMarker = "";
@@ -260,10 +259,6 @@ class LitAce extends LitElement {
       }, 250);
     });
 
-    if (this.initialFocus) {
-      this.editor.focus();
-    }
-
     editor.$blockScrolling = Infinity;
 
     this.themeChanged();
@@ -276,8 +271,6 @@ class LitAce extends LitElement {
     editor.renderer.setShowGutter(this.showGutter);
     editor.renderer.setOption("displayIndentGuides", this.displayIndentGuides);
 
-    this.editorValue = "";
-
     editor.setOptions({
       autoScrollEditorIntoView: true,
       enableBasicAutocompletion: this.enableAutocompletion,
@@ -285,6 +278,12 @@ class LitAce extends LitElement {
       placeholder: this.placeholder,
       enableSnippets: this.enableSnippets,
     });
+
+    this.editorValue = "";
+
+    if (this.initialFocus) {
+      this.editor.focus();
+    }
 
     this.editor.statusbar = new this.statusBar(
       this.editor,
@@ -343,7 +342,7 @@ class LitAce extends LitElement {
     if (this.editor == undefined || value === undefined) {
       return;
     }
-    this.editor.setValue(value);
+    this.editor.setValue(value, 1);
   }
 
   readonlyChanged() {
@@ -469,60 +468,30 @@ class LitAce extends LitElement {
     this.editor.renderer.setShowGutter(this.showGutter);
   }
 
-  customAutoCompletionChanged() {
+  customAutocompletionChanged() {
     if (this.editor == undefined) {
       return;
     }
-    const rawString = String(this.customAutoCompletion);
-    const rawSplit = rawString.split("|");
-    if (rawString === "||") {
-      this.editor.completers = [
-        this.editor.langTools.snippetCompleter,
-        this.editor.langTools.keyWordCompleter,
-      ];
+
+    const parsed = JSON.parse(this.customAutocompletion);
+    const category = parsed.category;
+    const wordlist = parsed.wordlist;
+
+    var staticWordCompleter = {
+      getCompletions: function (editor, session, pos, prefix, callback) {
+        callback(
+          null,
+          wordlist.map(function (word) {
+            return { name: word, value: word, score: 10, meta: category };
+          })
+        );
+      },
+    };
+
+    if (parsed.keepcompleters) {
+      this.editor.completers.push(staticWordCompleter);
     } else {
-      var keepCurrentCompleters = rawSplit[2] === "true";
-      if (!keepCurrentCompleters) {
-        var staticWordCompleter = {
-          getCompletions: function (editor, session, pos, prefix, callback) {
-            const wordList = rawSplit[1].split(",");
-            callback(
-              null,
-              wordList.map(function (word) {
-                return {
-                  name: word,
-                  value: word,
-                  score: 10,
-                  meta: rawSplit[0],
-                };
-              })
-            );
-          },
-        };
-        this.editor.completers = [staticWordCompleter];
-      } else {
-        var staticWordCompleter = {
-          getCompletions: function (editor, session, pos, prefix, callback) {
-            const wordList = rawSplit[1].split(",");
-            callback(
-              null,
-              wordList.map(function (word) {
-                return {
-                  name: word,
-                  value: word,
-                  score: 10,
-                  meta: rawSplit[0],
-                };
-              })
-            );
-          },
-        };
-        this.editor.completers = [
-          staticWordCompleter,
-          this.editor.langTools.snippetCompleter,
-          this.editor.langTools.keyWordCompleter,
-        ];
-      }
+      this.editor.completers = [staticWordCompleter];
     }
   }
 
@@ -641,6 +610,10 @@ class LitAce extends LitElement {
   }
 
   dynamicAutocompletionChanged() {
+    if (this.editor == undefined) {
+      return;
+    }
+
     const parsed = JSON.parse(this.dynamicAutocompletion);
     const seperator = parsed.seperator;
     const list = parsed.list;
@@ -747,8 +720,8 @@ class LitAce extends LitElement {
 
   setSelection(json) {
     if (this.editor == undefined) {
-      this.addEventListener("editor-ready", () => {
-        this._setSelection(json), { once: true };
+      this.addEventListener("editor-ready", () => this._setSelection(json), {
+        once: true,
       });
     } else {
       this._setSelection(json);
@@ -771,9 +744,11 @@ class LitAce extends LitElement {
 
   setCursorPosition(json) {
     if (this.editor == undefined) {
-      this.addEventListener("editor-ready", () => {
-        this._setCursorPosition(json), { once: true };
-      });
+      this.addEventListener(
+        "editor-ready",
+        () => this._setCursorPosition(json),
+        { once: true }
+      );
     } else {
       this._setCursorPosition(json);
     }
@@ -788,8 +763,8 @@ class LitAce extends LitElement {
 
   setValue(value) {
     if (this.editor == undefined) {
-      this.addEventListener("editor-ready", () => {
-        this._setValue(value), { once: true };
+      this.addEventListener("editor-ready", () => this._setValue(value), {
+        once: true,
       });
     } else {
       this._setValue(value);
@@ -807,8 +782,8 @@ class LitAce extends LitElement {
 
   resizeEditor() {
     if (this.editor == undefined) {
-      this.addEventListener("editor-ready", () => {
-        this._resizeEditor(), { once: true };
+      this.addEventListener("editor-ready", () => this._resizeEditor(), {
+        once: true,
       });
     } else {
       this._resizeEditor();
@@ -822,9 +797,11 @@ class LitAce extends LitElement {
 
   insertText(row, column, text) {
     if (this.editor == undefined) {
-      this.addEventListener("editor-ready", () => {
-        this._insertText(row, column, rext), { once: true };
-      });
+      this.addEventListener(
+        "editor-ready",
+        () => this._insertText(row, column, rext),
+        { once: true }
+      );
     } else {
       this._insertText(row, column, text);
     }
@@ -841,7 +818,7 @@ class LitAce extends LitElement {
     if (this.editor == undefined) {
       this.addEventListener(
         "editor-ready",
-        (e) => this._calculateCursorPositionFromIndex(index),
+        () => this._calculateCursorPositionFromIndex(index),
         { once: true }
       );
     } else {
@@ -909,7 +886,7 @@ class LitAce extends LitElement {
     if (this.editor == undefined) {
       this.addEventListener(
         "editor-ready",
-        (e) => this._calculateSelectionByIndices(from, to),
+        () => this._calculateSelectionByIndices(from, to),
         { once: true }
       );
     } else {
@@ -996,7 +973,7 @@ class LitAce extends LitElement {
     if (this.editor == undefined) {
       this.addEventListener(
         "editor-ready",
-        (e) => this._replaceTextAtSelection(text),
+        () => this._replaceTextAtSelection(text),
         { once: true }
       );
     } else {
@@ -1016,7 +993,7 @@ class LitAce extends LitElement {
 
   generateHTML(raw) {
     if (this.editor == undefined) {
-      this.addEventListener("editor-ready", (e) => this._generateHTML(raw), {
+      this.addEventListener("editor-ready", () => this._generateHTML(raw), {
         once: true,
       });
     } else {
@@ -1095,7 +1072,7 @@ class LitAce extends LitElement {
 
   unfold() {
     if (this.editor == undefined) {
-      this.addEventListener("editor-ready", (e) => this._unfold(), {
+      this.addEventListener("editor-ready", () => this._unfold(), {
         once: true,
       });
     } else {
@@ -1110,7 +1087,7 @@ class LitAce extends LitElement {
 
   foldAll() {
     if (this.editor == undefined) {
-      this.addEventListener("editor-ready", (e) => this._foldAll(), {
+      this.addEventListener("editor-ready", () => this._foldAll(), {
         once: true,
       });
     } else {
@@ -1125,7 +1102,7 @@ class LitAce extends LitElement {
 
   foldAll(startRow) {
     if (this.editor == undefined) {
-      this.addEventListener("editor-ready", (e) => this._foldAll(startRow), {
+      this.addEventListener("editor-ready", () => this._foldAll(startRow), {
         once: true,
       });
     } else {
@@ -1140,7 +1117,7 @@ class LitAce extends LitElement {
 
   beautify() {
     if (this.editor == undefined) {
-      this.addEventListener("editor-ready", (e) => this._beautify(), {
+      this.addEventListener("editor-ready", () => this._beautify(), {
         once: true,
       });
     } else {
@@ -1150,13 +1127,14 @@ class LitAce extends LitElement {
 
   /** @private */
   _beautify() {
-    this.editor.beautify.beautify(this.editor.session);
+    this.editor.beautify.beautify(this.editor.getSession());
+    this.editorBlurChangeAction();
   }
 
   openAutocompletion() {
     if (this.editor == undefined) {
-      this.addEventListener("editor-ready", () => {
-        this._openAutocompletion(), { once: true };
+      this.addEventListener("editor-ready", () => this._openAutocompletion(), {
+        once: true,
       });
     } else {
       this._openAutocompletion();
@@ -1170,8 +1148,8 @@ class LitAce extends LitElement {
 
   scrollToLine(line) {
     if (this.editor == undefined) {
-      this.addEventListener("editor-ready", () => {
-        this._scrollToLine(line), { once: true };
+      this.addEventListener("editor-ready", () => this._scrollToLine(line), {
+        once: true,
       });
     } else {
       this._scrollToLine(line);
@@ -1186,8 +1164,8 @@ class LitAce extends LitElement {
 
   scrollToEnd() {
     if (this.editor == undefined) {
-      this.addEventListener("editor-ready", () => {
-        this._scrollToEnd(), { once: true };
+      this.addEventListener("editor-ready", () => this._scrollToEnd(), {
+        once: true,
       });
     } else {
       this._scrollToEnd();
@@ -1198,12 +1176,13 @@ class LitAce extends LitElement {
   _scrollToEnd() {
     let lastLine = this.editor.getSession().getLength();
     this.editor.scrollToLine(lastLine);
+    this.editorBlurChangeAction();
   }
 
   findAndSelect(text) {
     if (this.editor == undefined) {
-      this.addEventListener("editor-ready", () => {
-        this._findAndSelect(text), { once: true };
+      this.addEventListener("editor-ready", () => this._findAndSelect(text), {
+        once: true,
       });
     } else {
       this._findAndSelect(text);
@@ -1215,6 +1194,31 @@ class LitAce extends LitElement {
     let found = this.editor.find(text);
     if (found) {
       this.editor.renderer.scrollCursorIntoView(found.start, 0.5);
+      this.editorBlurChangeAction();
+    }
+  }
+
+  disableCustomAutocompletion(useDefault) {
+    if (this.editor == undefined) {
+      this.addEventListener(
+        "editor-ready",
+        () => this._disableCustomAutocompletion(useDefault),
+        { once: true }
+      );
+    } else {
+      this._disableCustomAutocompletion(useDefault);
+    }
+  }
+
+  /** @private */
+  _disableCustomAutocompletion(useDefault) {
+    if (useDefault) {
+      this.editor.completers = [
+        this.editor.langTools.snippetCompleter,
+        this.editor.langTools.keyWordCompleter,
+      ];
+    } else {
+      this.editor.completers = [];
     }
   }
 

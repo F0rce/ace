@@ -1,6 +1,6 @@
 {
   "name": "@f0rce/lit-ace",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Lit-Element Wrapper around the Ace Editor (https://ace.c9.io/)",
   "main": "lit-ace.js",
   "scripts": {

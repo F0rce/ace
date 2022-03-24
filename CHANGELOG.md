@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/F0rce/ace/compare/v2.0.1...v2.1.0) (2022-03-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* **customAutocompletion:** now uses List<String> instead of String Array
+
+### Features
+
+* **cursorPosition:** additional convenience methods ([21b316e](https://github.com/F0rce/ace/commit/21b316e6c9b727759e20a0fe1a1f8e2ce31a7902))
+* **customAutocompletion:** now uses List<String> instead of String Array ([70cb03b](https://github.com/F0rce/ace/commit/70cb03b54b56d6eb34abc08897c7a7029da3e7bc))
+* **selection:** additional convenience methods ([e2a3fac](https://github.com/F0rce/ace/commit/e2a3facf74f41b2aadc4795c7ccbdf51933e0837))
+
+
+### Bug Fixes
+
+* improved attach/detach logic ([0432964](https://github.com/F0rce/ace/commit/04329642facb7c7e0df361206a0dd23a71675aa3))
+
 ## [2.0.1](https://github.com/F0rce/ace/compare/v2.0.0...v2.0.1) (2022-03-16)
 
 

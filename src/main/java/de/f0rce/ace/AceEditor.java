@@ -64,7 +64,7 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   private boolean useWorker = false;
   private boolean liveAutocompletion = false;
   private boolean enableSnippets = false;
-  private String[] customAutoCompletion = new String[0];
+  private List<String> customAutocompletion = new ArrayList<String>();
   private List<AceMarker> markers = new ArrayList<AceMarker>();
   private boolean statusbarEnabled = true;
 
@@ -694,87 +694,104 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   /**
    * Sets a custom autocompletion list for the editor.
    *
-   * @param wordList String[]
+   * @param wordList {@link List}
    */
-  public void setCustomAutoCompletion(String[] wordList) {
-    if (wordList.length == 0) {
-      this.customAutoCompletion = new String[0];
+  public void setCustomAutocompletion(List<String> wordList) {
+    if (wordList.size() == 0) {
       return;
     }
     this.getElement()
-        .setProperty("customAutoCompletion", "|" + String.join(",", wordList) + "|" + false);
-    this.customAutoCompletion = wordList;
+        .setProperty("customAutocompletion", AceJSON.generateCustomAutocompletionJSON(wordList));
+    this.customAutocompletion = wordList;
   }
 
   /**
    * Sets a custom autocompletion list for the editor and optionally keeps the current completers.
    *
-   * @param wordList String[]
+   * @param wordList {@link List}
    * @param keepCurrentCompleters boolean
    */
-  public void setCustomAutoCompletion(String[] wordList, boolean keepCurrentCompleters) {
-    if (wordList.length == 0) {
-      this.customAutoCompletion = new String[0];
+  public void setCustomAutocompletion(List<String> wordList, boolean keepCurrentCompleters) {
+    if (wordList.size() == 0) {
       return;
     }
     this.getElement()
         .setProperty(
-            "customAutoCompletion", "|" + String.join(",", wordList) + "|" + keepCurrentCompleters);
-    this.customAutoCompletion = wordList;
+            "customAutocompletion",
+            AceJSON.generateCustomAutocompletionJSON(wordList, keepCurrentCompleters));
+    if (keepCurrentCompleters) {
+      this.customAutocompletion.addAll(wordList);
+    } else {
+      this.customAutocompletion = wordList;
+    }
   }
 
   /**
-   * Sets a custom autocompletion list for the editor and sets the category aswell (default: "").
+   * Sets a custom autocompletion list for the editor and sets the category aswell (default:
+   * "keyword").
    *
-   * @param wordList String[]
+   * @param wordList {@link List}
    * @param category {@link String}
    */
-  public void setCustomAutoCompletion(String[] wordList, String category) {
-    if (wordList.length == 0) {
-      this.customAutoCompletion = new String[0];
+  public void setCustomAutocompletion(List<String> wordList, String category) {
+    if (wordList.size() == 0) {
       return;
     }
     this.getElement()
-        .setProperty("customAutoCompletion", category + "|" + String.join(",", wordList));
-    this.customAutoCompletion = wordList;
+        .setProperty(
+            "customAutocompletion", AceJSON.generateCustomAutocompletionJSON(wordList, category));
+    this.customAutocompletion = wordList;
   }
 
   /**
-   * Sets a custom autocompletion list for the editor, sets the category (default: "") and
+   * Sets a custom autocompletion list for the editor, sets the category (default: "keyword") and
    * optionally keeps the current completers.
    *
-   * @param wordList String[]
+   * @param wordList {@link List}
    * @param category {@link String}
    * @param keepCurrentCompleters boolean
    */
-  public void setCustomAutoCompletion(
-      String[] wordList, String category, boolean keepCurrentCompleters) {
-    if (wordList.length == 0) {
-      this.customAutoCompletion = new String[0];
+  public void setCustomAutocompletion(
+      List<String> wordList, String category, boolean keepCurrentCompleters) {
+    if (wordList.size() == 0) {
       return;
     }
     this.getElement()
         .setProperty(
-            "customAutoCompletion",
-            category + "|" + String.join(",", wordList) + "|" + keepCurrentCompleters);
-    this.customAutoCompletion = wordList;
+            "customAutocompletion",
+            AceJSON.generateCustomAutocompletionJSON(wordList, category, keepCurrentCompleters));
+    if (keepCurrentCompleters) {
+      this.customAutocompletion.addAll(wordList);
+    } else {
+      this.customAutocompletion = wordList;
+    }
   }
 
   /**
-   * Returns a String array of the current custom autocompletion for the editor.
+   * Returns a {@link List} of the current custom autocompletion for the editor.
    *
-   * @return String[]
+   * @return {@link List}
    */
-  public String[] getCustomAutoCompletion() {
-    return this.customAutoCompletion;
+  public List<String> getCustomAutocompletion() {
+    return this.customAutocompletion;
   }
 
   /**
-   * Removes the custom autocompletion list set with setCustomAutoCompletiton() and replaces it with
-   * the default one.
+   * Removes the custom autocompletion list set with setCustomAutocompletiton() and replaces it with
+   * the default ones.
    */
-  public void disableCustomAutoCompletion() {
-    this.getElement().setProperty("customAutoCompletion", "||");
+  public void disableCustomAutocompletion() {
+    this.disableCustomAutocompletion(true);
+  }
+
+  /**
+   * Removes the custom autocompletion list set wit setCustomAutocompletion(...) and replaces it
+   * optionally with the default ones.
+   *
+   * @param useDefault boolean
+   */
+  public void disableCustomAutocompletion(boolean useDefault) {
+    this.getElement().callJsFunction("disableCustomAutocompletion", useDefault);
   }
 
   /**

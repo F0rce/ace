@@ -13,7 +13,8 @@ import de.f0rce.ace.AceEditor;
  */
 public class AceJSON {
 
-  private static final String DEFAULT_CATEGORY = "dynamic";
+  private static final String DEFAULT_DYNAMIC_CATEGORY = "dynamic";
+  private static final String DEFAULT_CUSTOM_CATEGORY = "keyword";
 
   /**
    * {@link AceEditor#addDynamicAutocompletion(Map, String, String, boolean)}
@@ -70,7 +71,8 @@ public class AceJSON {
    */
   public static String generateDynamicAutocompletionJSON(
       Map<String, List<String>> toConvert, String seperator) {
-    return AceJSON.generateDynamicAutocompletionJSON(toConvert, seperator, DEFAULT_CATEGORY, false);
+    return AceJSON.generateDynamicAutocompletionJSON(
+        toConvert, seperator, DEFAULT_DYNAMIC_CATEGORY, false);
   }
 
   /**
@@ -97,7 +99,7 @@ public class AceJSON {
   public static String generateDynamicAutocompletionJSON(
       Map<String, List<String>> toConvert, String seperator, boolean keepCompleters) {
     return AceJSON.generateDynamicAutocompletionJSON(
-        toConvert, seperator, DEFAULT_CATEGORY, keepCompleters);
+        toConvert, seperator, DEFAULT_DYNAMIC_CATEGORY, keepCompleters);
   }
 
   /**
@@ -137,5 +139,72 @@ public class AceJSON {
     builder.append("}");
 
     return builder.toString();
+  }
+
+  /**
+   * {@link AceEditor#setCustomAutocompletion(List, String, boolean)}
+   *
+   * @param wordList {@link List}
+   * @param category {@link String}
+   * @param keepCurrentCompleters boolean
+   * @return {@link String}
+   */
+  public static String generateCustomAutocompletionJSON(
+      List<String> wordList, String category, boolean keepCurrentCompleters) {
+    StringBuilder builder = new StringBuilder();
+
+    builder.append("{");
+    builder.append("\"category\": " + "\"" + category + "\", ");
+    builder.append("\"keepcompleters\": " + keepCurrentCompleters + ", ");
+
+    builder.append("\"wordlist\": " + "[");
+    int counter = 0;
+    for (String word : wordList) {
+      builder.append("\"" + word + "\"");
+      if (counter != wordList.size() - 1) {
+        builder.append(", ");
+      }
+      if (counter == wordList.size() - 1) {
+        builder.append("]");
+      }
+      counter++;
+    }
+    builder.append("}");
+
+    return builder.toString();
+  }
+
+  /**
+   * {@link AceEditor#setCustomAutocompletion(List)}
+   *
+   * @param wordList {@link Map}
+   * @return {@link String}
+   */
+  public static String generateCustomAutocompletionJSON(List<String> wordList) {
+    return AceJSON.generateCustomAutocompletionJSON(wordList, DEFAULT_CUSTOM_CATEGORY, false);
+  }
+
+  /**
+   * {@link AceEditor#setCustomAutocompletion(List, boolean)}
+   *
+   * @param wordList {@link List}
+   * @param keepCurrentCompleters boolean
+   * @return {@link String}
+   */
+  public static String generateCustomAutocompletionJSON(
+      List<String> wordList, boolean keepCurrentCompleters) {
+    return AceJSON.generateCustomAutocompletionJSON(
+        wordList, DEFAULT_CUSTOM_CATEGORY, keepCurrentCompleters);
+  }
+
+  /**
+   * {@link AceEditor#setCustomAutocompletion(List, String)}
+   *
+   * @param wordList {@link List}
+   * @param category {@link String}
+   * @return {@link String}
+   */
+  public static String generateCustomAutocompletionJSON(List<String> wordList, String category) {
+    return AceJSON.generateCustomAutocompletionJSON(wordList, category, false);
   }
 }

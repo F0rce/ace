@@ -63,11 +63,11 @@ ace.define(
             regex: "[Ll]ists:|[Mm]aps:|[Vv]ariables:",
           },
           {
-            token: "support.type",
+            token: "support.constant",
             regex: "(MSG_CALL_VAR_SYS_)",
           },
           {
-            token: "support.type",
+            token: "support.constant",
             regex: "(MSG_CALL_)",
           },
           {

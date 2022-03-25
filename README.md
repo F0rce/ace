@@ -16,9 +16,9 @@ Vaadin Add-On - [Ace](http://ace.c9.io/) - The High Performance Code Editor
 
 ## Version Guide
 
-*(v1.0: will have one last update to allow backwards compability with `AbstractSinglePropertyField` and to have all improvements done to v2.0)*</br> 
-[v2.0](https://github.com/F0rce/ace/tree/master): Built for Vaadin 14 (with Java 8) extends `Component` (LTS)</br>
-[v3.0](https://github.com/F0rce/ace/tree/3.0): Built for Vaadin 23 (with Java 11) extends `Component`
+*(v1.x: will have one last update to allow backwards compability with `AbstractSinglePropertyField` and to have all improvements done to v2.0)*</br> 
+[v2.x](https://github.com/F0rce/ace/tree/master): Built for Vaadin 14 (with Java 8) extends `Component` (LTS)</br>
+[v3.x](https://github.com/F0rce/ace/tree/3.x): Built for Vaadin 23 (with Java 11) extends `Component`
 
 ## Preview and Demo
 

@@ -1,3 +1,4 @@
+![Screenshot 2022-03-25 092436](https://user-images.githubusercontent.com/60381251/160082712-7f4b37ca-08d6-4270-a5f1-d17c147afe21.png)</br>
 [![Published on Vaadin  Directory](https://img.shields.io/badge/Vaadin%20Directory-published-00b4f0.svg)](https://vaadin.com/directory/component/ace)
 [![Stars on vaadin.com/directory](https://img.shields.io/vaadin-directory/star/ace.svg)](https://vaadin.com/directory/component/ace)
 [![Vaadin Directory](https://img.shields.io/vaadin-directory/v/ace)](https://vaadin.com/directory/component/ace)

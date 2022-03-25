@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/F0rce/ace/compare/v2.1.0...v3.0.0) (2022-03-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* **java:** ace (3.0) requires Java 11
+* **vaadin:** ace (3.0) supports Vaadin 23.0
+
+### Features
+
+* **java:** ace (3.0) requires Java 11 ([29b2f2f](https://github.com/F0rce/ace/commit/29b2f2ffc6e14eb8414f197208f25ad35736a5c0))
+* **vaadin:** ace (3.0) supports Vaadin 23.0 ([3b353c4](https://github.com/F0rce/ace/commit/3b353c4d12fa2d9ed017c6f3d32d1cc3507a4edd))
+
 ## [2.1.0](https://github.com/F0rce/ace/compare/v2.0.1...v2.1.0) (2022-03-24)
 
 

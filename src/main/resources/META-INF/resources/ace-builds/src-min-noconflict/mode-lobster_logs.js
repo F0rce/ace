@@ -40,10 +40,6 @@ ace.define(
             regex: "^\\[.*?\\]",
           },
           {
-            token: "constant.numeric",
-            regex: "\\d([:.]?(?=\\d))?",
-          },
-          {
             token: "string",
             regex: "'(?=.)",
             next: "qstring",

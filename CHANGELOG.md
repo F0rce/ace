@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.1](https://github.com/F0rce/ace/compare/v3.0.0...v3.0.1) (2022-04-12)
+
+
+### Bug Fixes
+
+* **lobster_logs:** removed highlighting of every digit ([005bef6](https://github.com/F0rce/ace/commit/005bef6242c6c1f50164f212b4143f56474fdddc))
+* **lobster_records:** removed highlighting of every digit ([3f636e3](https://github.com/F0rce/ace/commit/3f636e32ba63cc90fd9fb91bdde6fb805f4f5827))
+
 ## [3.0.0](https://github.com/F0rce/ace/compare/v2.1.0...v3.0.0) (2022-03-25)
 
 

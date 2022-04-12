@@ -45,10 +45,6 @@ ace.define(
             next: "handleOpeningBrace",
           },
           {
-            token: "constant.numeric",
-            regex: "\\d",
-          },
-          {
             token: "string",
             regex: "'(?=.)",
             next: "qstring",

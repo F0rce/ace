@@ -1,10 +1,9 @@
 package de.f0rce.ace.util;
 
+import de.f0rce.ace.AceEditor;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import de.f0rce.ace.AceEditor;
 
 /**
  * Utility Class for generating JSON Objects to be sent to the frontend.

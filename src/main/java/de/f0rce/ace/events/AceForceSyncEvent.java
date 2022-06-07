@@ -1,7 +1,6 @@
 package de.f0rce.ace.events;
 
 import com.vaadin.flow.component.ComponentEvent;
-
 import de.f0rce.ace.AceEditor;
 import de.f0rce.ace.util.AceCursorPosition;
 import de.f0rce.ace.util.AceSelection;

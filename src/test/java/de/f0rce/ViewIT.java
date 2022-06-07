@@ -1,9 +1,8 @@
 package de.f0rce;
 
+import com.vaadin.testbench.TestBenchElement;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.vaadin.testbench.TestBenchElement;
 
 public class ViewIT extends AbstractViewTest {
 

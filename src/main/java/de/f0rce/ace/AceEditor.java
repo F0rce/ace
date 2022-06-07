@@ -1188,16 +1188,16 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
    * be used to print for example. Use {@link #addHTMLGeneratedListener(ComponentEventListener)} to
    * get the HTML as soon as the generate is done.
    *
-   * @param raw boolean
+   * @param type {@link AceExportType}
    */
-  public void generateHTML(boolean raw) {
-    this.getElement().callJsFunction("generateHTML", raw);
+  public void generateHTML(AceExportType type) {
+    this.getElement().callJsFunction("generateHTML", type.getType());
   }
 
   /**
    * Add a listener to the editor, which listens to when the HTML generate completed, which is
-   * triggered by the {@link #generateHTML(boolean)} method. Check {@link AceHTMLGeneratedEvent} for
-   * all availible returned values.
+   * triggered by the {@link #generateHTML(AceExportType)} method. Check {@link
+   * AceHTMLGeneratedEvent} for all availible returned values.
    *
    * @param listener {@link ComponentEventListener}
    * @return {@link Registration}

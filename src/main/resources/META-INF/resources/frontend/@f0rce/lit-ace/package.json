@@ -1,12 +1,12 @@
 {
   "name": "@f0rce/lit-ace",
-  "version": "1.7.1",
+  "version": "1.8.2",
   "description": "Lit-Element Wrapper around the Ace Editor (https://ace.c9.io/)",
   "main": "lit-ace.js",
   "scripts": {
-    "release:minor": "standard-version --release-as minor",
-    "release:patch": "standard-version --release-as patch",
-    "release:major": "standard-version --release-as major"
+    "release:minor": "standard-version --release-as minor --sign",
+    "release:patch": "standard-version --release-as patch --sign",
+    "release:major": "standard-version --release-as major --sign"
   },
   "repository": {
     "type": "git",
@@ -19,12 +19,12 @@
   },
   "homepage": "https://github.com/f0rce/lit-ace#readme",
   "dependencies": {
-    "@f0rce/ace-builds": "^1.5.3",
-    "lit": "^2.2.2"
+    "@f0rce/ace-builds": "^1.6.2",
+    "lit": "^2.2.5"
   },
   "devDependencies": {
     "@types/ace": "^0.0.47",
-    "@webcomponents/webcomponentsjs": "^2.5.0",
-    "standard-version": "^9.3.2"
+    "@webcomponents/webcomponentsjs": "^2.6.0",
+    "standard-version": "^9.5.0"
   }
 }

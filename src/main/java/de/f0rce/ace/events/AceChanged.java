@@ -3,7 +3,6 @@ package de.f0rce.ace.events;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.DomEvent;
 import com.vaadin.flow.component.EventData;
-
 import de.f0rce.ace.AceEditor;
 
 /** @author Jean-Christophe "jcgueriaud1" Gueriaud */

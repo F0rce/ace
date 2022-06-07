@@ -1,9 +1,5 @@
 package de.f0rce;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Shortcuts;
 import com.vaadin.flow.component.button.Button;
@@ -19,10 +15,13 @@ import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
-
 import de.f0rce.ace.AceEditor;
+import de.f0rce.ace.enums.AceExportType;
 import de.f0rce.ace.enums.AceMode;
 import de.f0rce.ace.enums.AceTheme;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 @Theme(themeClass = Lumo.class, variant = Lumo.DARK)
 @Route("")
@@ -108,7 +107,12 @@ public class View extends VerticalLayout implements AppShellConfigurator {
     map.put("going", l3);
 
     aceEditor.setValue(
-        "\n\n\n\n\n\n\nawdawdawdawdawdawd\n\nawdawdawd\nawdawd\n\naf\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ntest");
+        "\n\n\n\n\n\n\n"
+            + "awdawdawdawdawdawd\n\n"
+            + "awdawdawd\n"
+            + "awdawd\n\n"
+            + "af\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+            + "test");
 
     ArrayList<String> custom = new ArrayList<String>();
     custom.add("JSON");
@@ -117,7 +121,7 @@ public class View extends VerticalLayout implements AppShellConfigurator {
     custom.add("coole");
     custom.add("Sache");
 
-    aceEditor.setCustomAutocompletion(custom, "JSONTest", false);
+    aceEditor.setCustomAutocompletion(custom, "JSONTest", true);
 
     // aceEditor.addCustomAutocompletion(l3, "food", true);
     aceEditor.addDynamicAutocompletion(map, ".", "not dynmaic", true);
@@ -129,18 +133,19 @@ public class View extends VerticalLayout implements AppShellConfigurator {
 
     // aceEditor.setCustomAutoCompletion(str);
 
-    //    aceEditor.addSelectionChangeListener(
-    //        event -> {
-    //          System.out.println(
-    //              event.getSelectionRowStart()
-    //                  + " "
-    //                  + event.getSelectionFrom()
-    //                  + " "
-    //                  + event.getSelectionRowEnd()
-    //                  + " "
-    //                  + event.getSelectionTo());
-    //          System.out.println(event.getCursorRow() + " " + event.getCursorColumn());
-    //        });
+    aceEditor.addSelectionChangeListener(
+        event -> {
+          System.out.println(
+              event.getSelection().getStartColumn()
+                  + " "
+                  + event.getSelection().getEndColumn()
+                  + " "
+                  + event.getSelection().getStartRow()
+                  + " "
+                  + event.getSelection().getEndRow());
+          System.out.println(
+              event.getCursorPosition().getColumn() + " " + event.getCursorPosition().getRow());
+        });
     //
     //		aceEditor.addFocusListener(e -> {
     //		 System.out.println("Focus");
@@ -148,6 +153,8 @@ public class View extends VerticalLayout implements AppShellConfigurator {
 
     themesComboBox.setValue(aceEditor.getTheme());
     modesComboBox.setValue(aceEditor.getMode());
+
+    aceEditor.setEnableSnippets(true);
 
     Button button = new Button("demo");
     Button button2 = new Button("rm custom");
@@ -182,6 +189,11 @@ public class View extends VerticalLayout implements AppShellConfigurator {
           }
         });
 
+    cb.addValueChangeListener(
+        evt -> {
+          aceEditor.setEnableSnippets(evt.getValue());
+        });
+
     button.addClickListener(event -> {});
 
     button2.addClickListener(
@@ -190,20 +202,8 @@ public class View extends VerticalLayout implements AppShellConfigurator {
         });
     button3.addClickListener(
         event -> {
-          aceEditor.unfold();
+          aceEditor.generateHTML(AceExportType.RICH);
         });
-
-    Shortcuts.addShortcutListener(
-            aceEditor,
-            event -> {
-              aceEditor.addSyncCompletedListener(
-                  evt -> {
-                    // current cursor position
-                  });
-              aceEditor.sync();
-            },
-            Key.ARROW_RIGHT)
-        .listenOn(aceEditor);
 
     aceEditor.addHTMLGeneratedListener(
         event -> {

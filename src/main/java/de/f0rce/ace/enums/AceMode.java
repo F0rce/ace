@@ -179,6 +179,7 @@ public enum AceMode {
   vhdl,
   visualforce,
   wollok,
+  x12,
   xml,
   xquery,
   yaml,

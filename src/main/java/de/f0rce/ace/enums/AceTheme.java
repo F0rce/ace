@@ -5,6 +5,9 @@ public enum AceTheme {
   ambiance,
   chaos,
   chrome,
+  cloud9_day,
+  cloud9_night,
+  cloud9_night_low_color,
   clouds,
   clouds_midnight,
   cobalt,
@@ -40,5 +43,5 @@ public enum AceTheme {
   tomorrow_night_eighties,
   twilight,
   vibrant_ink,
-  xcode;
+  xcode
 }

@@ -14,6 +14,7 @@ import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.shared.Registration;
@@ -38,7 +39,8 @@ import de.f0rce.ace.util.AceSelection;
 /** @author David "F0rce" Dodlek */
 @SuppressWarnings("serial")
 @Tag("lit-ace")
-@NpmPackage(value = "@f0rce/lit-ace", version = "1.7.1")
+@CssImport("./styles/ace_autocompletion_overwrite.css")
+@NpmPackage(value = "@f0rce/lit-ace", version = "1.8.2")
 @JsModule("./@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends Component implements HasSize, HasStyle, Focusable<AceEditor> {
 

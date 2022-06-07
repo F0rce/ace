@@ -1,11 +1,5 @@
 package de.f0rce.ace;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -18,7 +12,6 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.shared.Registration;
-
 import de.f0rce.ace.enums.AceExportType;
 import de.f0rce.ace.enums.AceMarkerColor;
 import de.f0rce.ace.enums.AceMode;
@@ -35,6 +28,11 @@ import de.f0rce.ace.util.AceCursorPosition;
 import de.f0rce.ace.util.AceJSON;
 import de.f0rce.ace.util.AceMarker;
 import de.f0rce.ace.util.AceSelection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 /** @author David "F0rce" Dodlek */
 @SuppressWarnings("serial")

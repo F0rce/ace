@@ -68,6 +68,7 @@ public enum AceMode {
   html_ruby,
   ini,
   io,
+  ion,
   jack,
   jade,
   java,
@@ -86,6 +87,9 @@ public enum AceMode {
   liquid,
   lisp,
   livescript,
+  lobster_expert_search,
+  lobster_logs,
+  lobster_records,
   logiql,
   logtalk,
   lsl,
@@ -110,6 +114,7 @@ public enum AceMode {
   nunjucks,
   objectivec,
   ocaml,
+  partiql,
   pascal,
   perl,
   pgsql,
@@ -136,6 +141,7 @@ public enum AceMode {
   rst,
   ruby,
   rust,
+  sac,
   sass,
   scad,
   scala,
@@ -176,8 +182,5 @@ public enum AceMode {
   xml,
   xquery,
   yaml,
-  zeek,
-  lobster_logs,
-  lobster_records,
-  lobster_expert_search;
+  zeek
 }

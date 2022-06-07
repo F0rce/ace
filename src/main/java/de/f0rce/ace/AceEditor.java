@@ -18,6 +18,7 @@ import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.shared.Registration;
 
+import de.f0rce.ace.enums.AceExportType;
 import de.f0rce.ace.enums.AceMarkerColor;
 import de.f0rce.ace.enums.AceMode;
 import de.f0rce.ace.enums.AceTheme;
@@ -1460,5 +1461,14 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
    */
   public Registration addValueChangeListener(ComponentEventListener<AceValueChanged> listener) {
     return this.addListener(AceValueChanged.class, listener);
+  }
+
+  /**
+   * Open a print dialog with current's ace value.
+   *
+   * @param exportType {@link AceExportType}
+   */
+  public void print(AceExportType exportType) {
+    this.getElement().callJsFunction("print", exportType.getType());
   }
 }

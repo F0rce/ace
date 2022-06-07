@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/f0rce/ace/compare/v2.1.1...v2.2.0) (2022-06-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* changed method parameter for `generateHTML()`
+
+### Features
+
+* added method to open a print dialog with ace's current value ([060e921](https://github.com/f0rce/ace/commit/060e9211485f93919df5217940db6c4d7da9eac5))
+* **modes:** added `x12` highlighter (wip) ([149eea9](https://github.com/f0rce/ace/commit/149eea931affe36110852185f7597a9577a3277b))
+* updated modes & themes ([6239c5c](https://github.com/f0rce/ace/commit/6239c5c0f72d5add5c02f716835dd61bedd5bd2a))
+
+
+### Bug Fixes
+
+* autocompletion under the editor ([c9113a4](https://github.com/f0rce/ace/commit/c9113a40edb63045ceb938823b8109d7f08fb15f))
+* changed method parameter for `generateHTML()` ([7a54ae5](https://github.com/f0rce/ace/commit/7a54ae528e872b82635ecb0c53f8ccaa4d0fc49f))
+
 ## [2.1.1](https://github.com/F0rce/ace/compare/v2.1.0...v2.1.1) (2022-04-12)
 
 

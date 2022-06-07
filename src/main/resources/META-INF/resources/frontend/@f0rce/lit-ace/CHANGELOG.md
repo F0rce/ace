@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.2](https://github.com/f0rce/lit-ace/compare/v1.8.1...v1.8.2) (2022-06-07)
+
+
+### Bug Fixes
+
+* correctly attach ace to shadow-root ([d873cbd](https://github.com/f0rce/lit-ace/commit/d873cbdd58c091797f6be5fdbdf93e968dff62ba))
+
+### [1.8.1](https://github.com/f0rce/lit-ace/compare/v1.8.0...v1.8.1) (2022-06-02)
+
+## [1.8.0](https://github.com/f0rce/lit-ace/compare/v1.7.1...v1.8.0) (2022-06-02)
+
+
+### Features
+
+* added `print()` method ([424dce2](https://github.com/f0rce/lit-ace/commit/424dce24855d7eff0e0a04454866d673a54247ae))
+
+
+### Bug Fixes
+
+* `snippetManager` is now a global variable ([d29be32](https://github.com/f0rce/lit-ace/commit/d29be329df77d5e620755d8eea6c08e04b60f120))
+
 ### [1.7.1](https://github.com/f0rce/lit-ace/compare/v1.7.0...v1.7.1) (2022-04-12)
 
 ## [1.7.0](https://github.com/f0rce/lit-ace/compare/v1.6.0...v1.7.0) (2022-03-24)

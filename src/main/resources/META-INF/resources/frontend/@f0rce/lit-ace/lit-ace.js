@@ -190,10 +190,12 @@ class LitAce extends LitElement {
     this.editorStatusbarDiv = this.shadowRoot.getElementById("editorStatusbar");
 
     this.editor = ace.edit(this.editorDiv);
+    this.editor.renderer.attachToShadowRoot();
     this.editor.langTools = ace.require("ace/ext/language_tools");
     this.editor.staticHighlight = ace.require("ace/ext/static_highlight");
     this.editor.beautify = ace.require("ace/ext/beautify");
     this.statusBar = ace.require("ace/ext/statusbar").StatusBar;
+    this.snippetManager = ace.require("ace/snippets").snippetManager;
 
     let self = this;
 
@@ -236,8 +238,6 @@ class LitAce extends LitElement {
 
   initializeEditor() {
     let editor = this.editor;
-
-    this.injectStyle("#ace_editor\\.css");
 
     ace.config.set("basePath", this.baseUrl);
     ace.config.set("modePath", this.baseUrl);
@@ -579,7 +579,7 @@ class LitAce extends LitElement {
       return;
     }
 
-    var snippetManager = ace.require("ace/snippets").snippetManager;
+    var snippetManager = this.snippetManager;
     var snippets = snippetManager.files;
 
     if (!this.enableSnippets) {
@@ -991,19 +991,23 @@ class LitAce extends LitElement {
     this.editorBlurChangeAction();
   }
 
-  generateHTML(raw) {
+  generateHTML(exportType) {
     if (this.editor == undefined) {
-      this.addEventListener("editor-ready", () => this._generateHTML(raw), {
-        once: true,
-      });
+      this.addEventListener(
+        "editor-ready",
+        () => this._generateHTML(exportType),
+        {
+          once: true,
+        }
+      );
     } else {
-      this._generateHTML(raw);
+      this._generateHTML(exportType);
     }
   }
 
   /** @private */
-  _generateHTML(raw) {
-    if (raw == true) {
+  _generateHTML(exportType) {
+    if (exportType.toLowerCase() == "flat") {
       let currentVal = this.editorValue;
 
       currentVal = currentVal.replace(/[\u00A0-\u9999<>\&]/g, function (i) {
@@ -1036,7 +1040,7 @@ class LitAce extends LitElement {
           },
         })
       );
-    } else {
+    } else if (exportType.toLowerCase() == "rich") {
       let self = this;
       ace
         .require("ace/config")
@@ -1222,6 +1226,95 @@ class LitAce extends LitElement {
     }
   }
 
+  print(exportType) {
+    if (this.editor == undefined) {
+      this.addEventListener("editor-ready", () => this._print(exportType), {
+        once: true,
+      });
+    } else {
+      this._print(exportType);
+    }
+  }
+
+  /** @private */
+  _print(exportType) {
+    if (exportType.toLowerCase() == "flat") {
+      let currentVal = this.editorValue;
+
+      currentVal = currentVal.replace(/[\u00A0-\u9999<>\&]/g, function (i) {
+        return "&#" + i.charCodeAt(0) + ";";
+      });
+      currentVal = currentVal.replace(new RegExp("\r?\n", "g"), "<br/>");
+      currentVal = currentVal.replace(/\s/g, "&nbsp;");
+
+      var htmlContent = `<!DOCTYPE html>
+<html>
+  <head>
+  <title>Ace Export</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
+    <style>
+      #aceRaw {
+        font-family: 'Source Code Pro', monospace;
+        font-size: 12px;
+      }
+      @media print {
+        @page {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+        body {
+            padding-top: 72px;
+            padding-bottom: 72px ;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="aceRaw">${currentVal}</div>
+  </body>
+</html>`;
+
+      this.initializePrint(htmlContent);
+    } else if (exportType.toLowerCase() == "rich") {
+      let self = this;
+      ace
+        .require("ace/config")
+        .loadModule("ace/ext/static_highlight", function (m) {
+          var result = m.renderSync(
+            self.editor.getValue(),
+            self.editor.session.getMode(),
+            self.editor.renderer.theme
+          );
+
+          var htmlContent = `<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ace Export</title>
+    <style>
+      ${result.css}
+      @media print {
+        @page {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+        body {
+            padding-top: 72px;
+            padding-bottom: 72px ;
+        }
+      }
+    </style>
+  </head>
+    <body>
+      ${result.html}
+    </body>
+</html>`;
+
+          self.initializePrint(htmlContent);
+        });
+    }
+  }
+
   /** @private */
   _createSelectionObject() {
     let editor = this.editor;
@@ -1271,15 +1364,51 @@ class LitAce extends LitElement {
     }
   }
 
-  /**
-   * Injects a style element into lit-ace's shadow root
-   * @param {CSSSelector} selector for an element in the same shadow tree or document as `lit-ace`
-   */
-  injectStyle(selector) {
-    const lightStyle =
-      this.getRootNode().querySelector(selector) ||
-      document.querySelector(selector);
-    this.shadowRoot.appendChild(lightStyle.cloneNode(true));
+  /** @private */
+  initializePrint(content) {
+    const popupWidth = 742;
+    const popupHeight = 600;
+
+    const dualScreenLeft =
+      window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+    const dualScreenTop =
+      window.screenTop !== undefined ? window.screenTop : window.screenY;
+
+    const width = window.innerWidth
+      ? window.innerWidth
+      : document.documentElement.clientWidth
+      ? document.documentElement.clientWidth
+      : screen.width;
+    const height = window.innerHeight
+      ? window.innerHeight
+      : document.documentElement.clientHeight
+      ? document.documentElement.clientHeight
+      : screen.height;
+
+    const systemZoom = width / window.screen.availWidth;
+    const left = (width - popupWidth) / 2 / systemZoom + dualScreenLeft;
+    const top = (height - popupHeight) / 2 / systemZoom + dualScreenTop;
+
+    var mywindow = window.open(
+      "",
+      "_blank",
+      `toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,copyhistory=no,height=${
+        popupHeight / systemZoom
+      },width=${popupWidth / systemZoom},top=${top},left=${left}`
+    );
+
+    if (!mywindow || mywindow.closed || typeof mywindow.closed == "undefined") {
+      return;
+    }
+
+    mywindow.document.write(content);
+    mywindow.document.close();
+
+    mywindow.onload = function () {
+      mywindow.focus();
+      mywindow.print();
+      mywindow.close();
+    };
   }
 }
 

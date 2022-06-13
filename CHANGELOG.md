@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.1](https://github.com/f0rce/ace/compare/v2.2.0...v2.2.1) (2022-06-13)
+
+
+### Bug Fixes
+
+* **autocompletion:** reverted hack as it was fixed in upstream ([5283671](https://github.com/f0rce/ace/commit/5283671c7ae4170cd05f50f835dbcb0f9788c4ec))
+
 ## [2.2.0](https://github.com/f0rce/ace/compare/v2.1.1...v2.2.0) (2022-06-07)
 
 

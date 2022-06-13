@@ -37,8 +37,7 @@ import java.util.UUID;
 /** @author David "F0rce" Dodlek */
 @SuppressWarnings("serial")
 @Tag("lit-ace")
-@CssImport("./styles/ace_autocompletion_overwrite.css")
-@NpmPackage(value = "@f0rce/lit-ace", version = "1.8.2")
+@NpmPackage(value = "@f0rce/lit-ace", version = "1.8.3")
 @JsModule("./@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends Component implements HasSize, HasStyle, Focusable<AceEditor> {
 

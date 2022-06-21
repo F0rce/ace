@@ -29,6 +29,7 @@ const useClientSideIndexFileForBootstrapping = true;
 const clientSideIndexHTML = './index.html';
 const clientSideIndexEntryPoint = path.resolve(__dirname, 'frontend', 'generated/', 'vaadin.ts');;
 const pwaEnabled = false;
+const offlineEnabled = false;
 const offlinePath = 'offline.html';
 const clientServiceWorkerEntryPoint = path.resolve(__dirname, 'target/sw');
 // public path for resources, must match Flow VAADIN_BUILD
@@ -51,12 +52,8 @@ const buildDirectory = path.resolve(__dirname, 'target');
 // Flow plugins
 const BuildStatusPlugin = require(buildDirectory + '/plugins/build-status-plugin');
 const ThemeLiveReloadPlugin = require(buildDirectory + '/plugins/theme-live-reload-plugin');
-const {
-  ApplicationThemePlugin,
-  processThemeResources,
-  extractThemeName,
-  findParentThemes
-} = require(buildDirectory + '/plugins/application-theme-plugin');
+const { ApplicationThemePlugin, processThemeResources, extractThemeName, findParentThemes } = require(buildDirectory +
+  '/plugins/application-theme-plugin');
 const themeLoader = buildDirectory + '/plugins/theme-loader';
 
 // Folders in the project which can contain static assets.
@@ -167,6 +164,7 @@ const createServiceWorkerPlugin = function () {
     ],
     webpackCompilationPlugins: [
       new DefinePlugin({
+        VITE_ENABLED: 'false',
         OFFLINE_PATH: JSON.stringify(offlinePath)
       })
     ]
@@ -337,13 +335,32 @@ module.exports = {
 
     function (compiler) {
       // V14 bootstrapping needs the bundle names
-      compiler.hooks.afterEmit.tapAsync("FlowStatsHelper", (compilation, done) => {
+      compiler.hooks.afterEmit.tapAsync('FlowStatsHelper', (compilation, done) => {
+        const st = compilation.getStats().toJson();
+        const modules = st.modules;
+        const nodeModulesFolders = modules
+          .map((module) => module.identifier)
+          .filter((id) => id.includes('node_modules'));
+        const npmModules = nodeModulesFolders
+          .map((id) => id.replace(/.*node_modules./, ''))
+          .map((id) => {
+            const parts = id.split('/');
+            if (id.startsWith('@')) {
+              return parts[0] + '/' + parts[1];
+            } else {
+              return parts[0];
+            }
+          })
+          .sort()
+          .filter((value, index, self) => self.indexOf(value) === index);
+
         let miniStats = {
-          assetsByChunkName: compilation.getStats().toJson().assetsByChunkName
+          assetsByChunkName: st.assetsByChunkName,
+          npmModules: npmModules
         };
+
         if (!devMode) {
-          fs.writeFile(statsFile, JSON.stringify(miniStats, null, 1),
-            () => done());
+          fs.writeFile(statsFile, JSON.stringify(miniStats, null, 1), () => done());
         } else {
           stats = miniStats;
           done();
@@ -362,7 +379,7 @@ module.exports = {
       }),
 
     // Service worker for offline
-    pwaEnabled && createServiceWorkerPlugin(),
+    offlineEnabled && createServiceWorkerPlugin(),
 
     // Generate compressed bundles when not devMode
     !devMode && new CompressionPlugin(),

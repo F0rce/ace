@@ -9,7 +9,7 @@
 	<description>Lit Wrap around the Ace Editor (https://ace.c9.io/) for Vaadin 14 and Vaadin 23</description>
 
 	<properties>
-		<vaadin.version>23.0.11</vaadin.version>
+		<vaadin.version>23.1.1</vaadin.version>
 
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>

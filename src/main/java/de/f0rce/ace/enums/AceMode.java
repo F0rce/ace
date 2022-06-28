@@ -138,6 +138,7 @@ public enum AceMode {
   red,
   redshift,
   rhtml,
+  robot,
   rst,
   ruby,
   rust,

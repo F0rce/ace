@@ -19,6 +19,8 @@ public enum AceTheme {
   github,
   gob,
   gruvbox,
+  gruvbox_dark_hard,
+  gruvbox_light_hard,
   idle_fingers,
   iplastic,
   katzenmilch,

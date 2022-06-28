@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/f0rce/lit-ace/compare/v1.8.3...v1.9.0) (2022-06-28)
+
+### [1.8.3](https://github.com/f0rce/lit-ace/compare/v1.8.2...v1.8.3) (2022-06-13)
+
+
+### Bug Fixes
+
+* **autocompletion:** updated to ace-builds "1.6.3" ([1064358](https://github.com/f0rce/lit-ace/commit/106435849d50542a5ba48a806299cdb8a710d7e9))
+
 ### [1.8.2](https://github.com/f0rce/lit-ace/compare/v1.8.1...v1.8.2) (2022-06-07)
 
 

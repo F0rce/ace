@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.2](https://github.com/f0rce/ace/compare/v2.2.1...v2.2.2) (2022-06-28)
+
+
+### Features
+
+* **modes:** added new mode ([e5ff014](https://github.com/f0rce/ace/commit/e5ff014d975cf951a2f7f7675e8ddbc71b6317e8))
+* **themes:** added new themes ([e9f1ab8](https://github.com/f0rce/ace/commit/e9f1ab8a774f9f250ad5d2327e52ef3ade653c3b))
+
 ## [2.2.1](https://github.com/f0rce/ace/compare/v2.2.0...v2.2.1) (2022-06-13)
 
 

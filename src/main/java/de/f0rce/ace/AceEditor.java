@@ -1,5 +1,10 @@
 package de.f0rce.ace;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -8,7 +13,6 @@ import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.shared.Registration;
@@ -28,16 +32,11 @@ import de.f0rce.ace.util.AceCursorPosition;
 import de.f0rce.ace.util.AceJSON;
 import de.f0rce.ace.util.AceMarker;
 import de.f0rce.ace.util.AceSelection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
 
 /** @author David "F0rce" Dodlek */
 @SuppressWarnings("serial")
 @Tag("lit-ace")
-@NpmPackage(value = "@f0rce/lit-ace", version = "1.8.3")
+@NpmPackage(value = "@f0rce/lit-ace", version = "1.9.0")
 @JsModule("./@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends Component implements HasSize, HasStyle, Focusable<AceEditor> {
 

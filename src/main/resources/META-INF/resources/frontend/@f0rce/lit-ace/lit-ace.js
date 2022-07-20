@@ -285,9 +285,11 @@ class LitAce extends LitElement {
       this.editor.focus();
     }
 
+    this._statusbarIndex = 1;
     this.editor.statusbar = new this.statusBar(
       this.editor,
-      this.editorStatusbarDiv
+      this.editorStatusbarDiv,
+      this._statusbarIndex
     );
 
     this.vScrollbarObserver = new IntersectionObserver(
@@ -1006,72 +1008,16 @@ class LitAce extends LitElement {
   }
 
   /** @private */
-  _generateHTML(exportType) {
-    if (exportType.toLowerCase() == "flat") {
-      let currentVal = this.editorValue;
+  async _generateHTML(exportType) {
+    const content = await this._generateExport(exportType);
 
-      currentVal = currentVal.replace(/[\u00A0-\u9999<>\&]/g, function (i) {
-        return "&#" + i.charCodeAt(0) + ";";
-      });
-      currentVal = currentVal.replace(new RegExp("\r?\n", "g"), "<br/>");
-      currentVal = currentVal.replace(/\s/g, "&nbsp;");
-
-      var htmlContent = `<!DOCTYPE html>
-<html>
-  <head>
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
-    <style>
-      #aceRaw {
-        font-family: 'Source Code Pro', monospace;
-        font-size: 12px;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="aceRaw">${currentVal}</div>
-  </body>
-</html>`;
-
-      this.dispatchEvent(
-        new CustomEvent("html-generated", {
-          detail: {
-            html: htmlContent,
-          },
-        })
-      );
-    } else if (exportType.toLowerCase() == "rich") {
-      let self = this;
-      ace
-        .require("ace/config")
-        .loadModule("ace/ext/static_highlight", function (m) {
-          var result = m.renderSync(
-            self.editor.getValue(),
-            self.editor.session.getMode(),
-            self.editor.renderer.theme
-          );
-
-          var htmlContent = `<!DOCTYPE html>
-<html>
-  <head>
-    <style>
-      ${result.css}
-    </style>
-  </head>
-    <body>
-      ${result.html}
-    </body>
-</html>`;
-
-          self.dispatchEvent(
-            new CustomEvent("html-generated", {
-              detail: {
-                html: htmlContent,
-              },
-            })
-          );
-        });
-    }
+    this.dispatchEvent(
+      new CustomEvent("html-generated", {
+        detail: {
+          html: content,
+        },
+      })
+    );
   }
 
   unfold() {
@@ -1237,82 +1183,42 @@ class LitAce extends LitElement {
   }
 
   /** @private */
-  _print(exportType) {
-    if (exportType.toLowerCase() == "flat") {
-      let currentVal = this.editorValue;
+  async _print(exportType) {
+    const content = await this._generateExport(exportType);
+    this._initializePrint(content);
+  }
 
-      currentVal = currentVal.replace(/[\u00A0-\u9999<>\&]/g, function (i) {
-        return "&#" + i.charCodeAt(0) + ";";
-      });
-      currentVal = currentVal.replace(new RegExp("\r?\n", "g"), "<br/>");
-      currentVal = currentVal.replace(/\s/g, "&nbsp;");
-
-      var htmlContent = `<!DOCTYPE html>
-<html>
-  <head>
-  <title>Ace Export</title>
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
-    <style>
-      #aceRaw {
-        font-family: 'Source Code Pro', monospace;
-        font-size: 12px;
-      }
-      @media print {
-        @page {
-            margin-top: 0;
-            margin-bottom: 0;
+  setStatusbarIndexing(statusbarIndex) {
+    if (this.editor == undefined) {
+      this.addEventListener(
+        "editor-ready",
+        () => this._setStatusbarIndexing(statusbarIndex),
+        {
+          once: true,
         }
-        body {
-            padding-top: 72px;
-            padding-bottom: 72px ;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="aceRaw">${currentVal}</div>
-  </body>
-</html>`;
-
-      this.initializePrint(htmlContent);
-    } else if (exportType.toLowerCase() == "rich") {
-      let self = this;
-      ace
-        .require("ace/config")
-        .loadModule("ace/ext/static_highlight", function (m) {
-          var result = m.renderSync(
-            self.editor.getValue(),
-            self.editor.session.getMode(),
-            self.editor.renderer.theme
-          );
-
-          var htmlContent = `<!DOCTYPE html>
-<html>
-  <head>
-    <title>Ace Export</title>
-    <style>
-      ${result.css}
-      @media print {
-        @page {
-            margin-top: 0;
-            margin-bottom: 0;
-        }
-        body {
-            padding-top: 72px;
-            padding-bottom: 72px ;
-        }
-      }
-    </style>
-  </head>
-    <body>
-      ${result.html}
-    </body>
-</html>`;
-
-          self.initializePrint(htmlContent);
-        });
+      );
+    } else {
+      this._setStatusbarIndexing(statusbarIndex);
     }
+  }
+
+  /** @private */
+  _setStatusbarIndexing(statusbarIndex) {
+    if (statusbarIndex == this._statusbarIndex) return;
+
+    this._statusbarIndex = statusbarIndex;
+
+    for (const child of this.editorStatusbarDiv.childNodes) {
+      this.editorStatusbarDiv.removeChild(child);
+    }
+
+    this.editor.statusbar = new this.statusBar(
+      this.editor,
+      this.editorStatusbarDiv,
+      this._statusbarIndex
+    );
+
+    this.editor.statusbar.updateStatus(this.editor, this._statusbarIndex);
   }
 
   /** @private */
@@ -1365,7 +1271,81 @@ class LitAce extends LitElement {
   }
 
   /** @private */
-  initializePrint(content) {
+  _generateExport(exportType) {
+    const printCSS = `@media print {
+  @page {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  body {
+    padding-top: 72px;
+    padding-bottom: 72px ;
+  }
+}`;
+
+    return new Promise((resolve) => {
+      if (exportType.toLowerCase() == "flat") {
+        let currentVal = this.editorValue;
+
+        currentVal = currentVal.replace(/[\u00A0-\u9999<>\&]/g, function (i) {
+          return "&#" + i.charCodeAt(0) + ";";
+        });
+        currentVal = currentVal.replace(new RegExp("\r?\n", "g"), "<br/>");
+        currentVal = currentVal.replace(/\s/g, "&nbsp;");
+
+        var htmlContent = `<!DOCTYPE html>
+<html>
+  <head>
+  <title>Ace Export</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
+    <style>
+      #aceRaw {
+        font-family: 'Source Code Pro', monospace;
+        font-size: 12px;
+      }
+      ${printCSS}
+    </style>
+  </head>
+  <body>
+    <div id="aceRaw">${currentVal}</div>
+  </body>
+</html>`;
+
+        resolve(htmlContent);
+      } else if (exportType.toLowerCase() == "rich") {
+        let self = this;
+        ace
+          .require("ace/config")
+          .loadModule("ace/ext/static_highlight", function (m) {
+            var result = m.renderSync(
+              self.editor.getValue(),
+              self.editor.session.getMode(),
+              self.editor.renderer.theme
+            );
+
+            var htmlContent = `<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ace Export</title>
+    <style>
+      ${result.css}
+      ${printCSS}
+    </style>
+  </head>
+    <body>
+      ${result.html}
+    </body>
+</html>`;
+
+            resolve(htmlContent);
+          });
+      }
+    });
+  }
+
+  /** @private */
+  _initializePrint(content) {
     const popupWidth = 742;
     const popupHeight = 600;
 

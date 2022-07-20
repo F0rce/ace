@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.0](https://github.com/f0rce/ace/compare/v3.1.2...v3.2.0) (2022-07-20)
+
+
+### Features
+
+* **statusbar:** possibility to set the starting index ([272b8ee](https://github.com/f0rce/ace/commit/272b8ee5e48b59538fa813d4aea33ce405b23e50))
+
 ## [3.1.2](https://github.com/f0rce/ace/compare/v3.1.1...v3.1.2) (2022-06-28)
 
 

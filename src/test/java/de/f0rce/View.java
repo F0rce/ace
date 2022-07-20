@@ -1,7 +1,8 @@
 package de.f0rce;
 
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.Shortcuts;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -17,10 +18,8 @@ import com.vaadin.flow.theme.lumo.Lumo;
 import de.f0rce.ace.AceEditor;
 import de.f0rce.ace.enums.AceExportType;
 import de.f0rce.ace.enums.AceMode;
+import de.f0rce.ace.enums.AceStatusbarIndexing;
 import de.f0rce.ace.enums.AceTheme;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 @Theme(value = Lumo.class, variant = Lumo.DARK)
 @Route("")
@@ -84,7 +83,9 @@ public class View extends VerticalLayout {
     aceEditor.setPlaceholder("DIES IST EIN TEST OB DER NEUE PLACEHOLDER FUNKTIONIERT");
     aceEditor.setMinHeight("300px");
     aceEditor.setMode(AceMode.java);
-    aceEditor.setStatusbarTextColor("red");
+    //    aceEditor.setStatusbarTextColor("red");
+
+    //    aceEditor.setStatusbarIndexing(AceStatusbarIndexing.ZERO_BASED);
 
     // aceEditor.setCustomAutoCompletion(new String[] {"search(", "test"}, "methods", false);
     ArrayList<String> list = new ArrayList<>();
@@ -190,18 +191,21 @@ public class View extends VerticalLayout {
 
     cb.addValueChangeListener(
         evt -> {
-          aceEditor.setEnableSnippets(evt.getValue());
+          aceEditor.print(AceExportType.FLAT);
         });
 
-    button.addClickListener(event -> {});
+    button.addClickListener(
+        event -> {
+          aceEditor.setStatusbarIndexing(AceStatusbarIndexing.ZERO_BASED);
+        });
 
     button2.addClickListener(
         event -> {
-          aceEditor.disableCustomAutocompletion(false);
+          aceEditor.setStatusbarIndexing(AceStatusbarIndexing.ONE_BASED);
         });
     button3.addClickListener(
         event -> {
-          aceEditor.generateHTML(AceExportType.RICH);
+          aceEditor.generateHTML(AceExportType.FLAT);
         });
 
     aceEditor.addHTMLGeneratedListener(

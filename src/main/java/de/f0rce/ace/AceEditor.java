@@ -37,6 +37,7 @@ import de.f0rce.ace.util.AceSelection;
 @SuppressWarnings("serial")
 @Tag("lit-ace")
 @NpmPackage(value = "@f0rce/lit-ace", version = "1.9.0")
+@NpmPackage(value = "@f0rce/lit-ace", version = "1.10.0")
 @JsModule("./@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends Component implements HasSize, HasStyle, Focusable<AceEditor> {
 

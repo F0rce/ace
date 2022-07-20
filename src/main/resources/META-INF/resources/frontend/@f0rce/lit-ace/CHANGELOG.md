@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/f0rce/lit-ace/compare/v1.9.0...v1.10.0) (2022-07-20)
+
+
+### Features
+
+* **statusbar:** possibility to choose the starting index ([7403120](https://github.com/f0rce/lit-ace/commit/7403120993259c58e85d1bfbd9a3d63feb790013))
+
 ## [1.9.0](https://github.com/f0rce/lit-ace/compare/v1.8.3...v1.9.0) (2022-06-28)
 
 ### [1.8.3](https://github.com/f0rce/lit-ace/compare/v1.8.2...v1.8.3) (2022-06-13)

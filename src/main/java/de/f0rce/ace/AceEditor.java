@@ -19,6 +19,7 @@ import com.vaadin.flow.shared.Registration;
 import de.f0rce.ace.enums.AceExportType;
 import de.f0rce.ace.enums.AceMarkerColor;
 import de.f0rce.ace.enums.AceMode;
+import de.f0rce.ace.enums.AceStatusbarIndexing;
 import de.f0rce.ace.enums.AceTheme;
 import de.f0rce.ace.events.AceBlurChanged;
 import de.f0rce.ace.events.AceChanged;
@@ -36,7 +37,6 @@ import de.f0rce.ace.util.AceSelection;
 /** @author David "F0rce" Dodlek */
 @SuppressWarnings("serial")
 @Tag("lit-ace")
-@NpmPackage(value = "@f0rce/lit-ace", version = "1.9.0")
 @NpmPackage(value = "@f0rce/lit-ace", version = "1.10.0")
 @JsModule("./@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends Component implements HasSize, HasStyle, Focusable<AceEditor> {
@@ -67,6 +67,7 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   private List<String> customAutocompletion = new ArrayList<String>();
   private List<AceMarker> markers = new ArrayList<AceMarker>();
   private boolean statusbarEnabled = true;
+  private AceStatusbarIndexing statusbarIndexing = AceStatusbarIndexing.ONE_BASED;
 
   // Some internal checking
   private boolean hasBeenDetached = false;
@@ -108,6 +109,10 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
           this.setSelection(this.selection);
         }
       }
+      if (this.statusbarIndexing != AceStatusbarIndexing.ONE_BASED) {
+        this.setStatusbarIndexing(this.statusbarIndexing);
+      }
+      this.hasBeenDetached = false;
     }
   }
 
@@ -1469,5 +1474,25 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
    */
   public void print(AceExportType exportType) {
     this.getElement().callJsFunction("print", exportType.getType());
+  }
+
+  /**
+   * Change the indexing (starting index) of the statusbar.
+   *
+   * @param statusbarIndexing {@link AceStatusbarIndexing}
+   */
+  public void setStatusbarIndexing(AceStatusbarIndexing statusbarIndexing) {
+    this.getElement().callJsFunction("setStatusbarIndexing", statusbarIndexing.getIntValue());
+    this.statusbarIndexing = statusbarIndexing;
+  }
+
+  /**
+   * Returns the current set indexing of the statusbar (defaults to {@link
+   * AceStatusbarIndexing#ONE_BASED}).
+   *
+   * @return {@link AceStatusbarIndexing}
+   */
+  public AceStatusbarIndexing getStatusbarIndexing() {
+    return this.statusbarIndexing;
   }
 }

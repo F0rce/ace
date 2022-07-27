@@ -87,6 +87,7 @@ public enum AceMode {
   liquid,
   lisp,
   livescript,
+  lobster_dc_logs,
   lobster_expert_search,
   lobster_logs,
   lobster_records,

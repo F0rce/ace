@@ -64,10 +64,6 @@ public class AceCursorPosition {
    * @return boolean
    */
   public boolean compareTo(AceCursorPosition a) {
-    if (a.getRow() == this.row && a.getColumn() == this.column && a.getIndex() == this.index) {
-      return true;
-    } else {
-      return false;
-    }
+    return a.getRow() == this.row && a.getColumn() == this.column && a.getIndex() == this.index;
   }
 }

@@ -118,16 +118,12 @@ public class AceSelection {
    * @return boolean
    */
   public boolean compareTo(AceSelection a) {
-    if (a.getStartRow() == this.startRow
+    return a.getStartRow() == this.startRow
         && a.getStartColumn() == this.startColumn
         && a.getStartIndex() == this.startIndex
         && a.getEndRow() == this.endRow
         && a.getEndColumn() == this.endColumn
         && a.getEndIndex() == this.endIndex
-        && a.getSelectedText().equals(this.selectedText)) {
-      return true;
-    } else {
-      return false;
-    }
+        && a.getSelectedText().equals(this.selectedText);
   }
 }

@@ -1,4 +1,4 @@
-name: Build and check formatting
+name: Build
 
 on:
   push:
@@ -24,14 +24,4 @@ jobs:
       - name: Production Build with Maven
         run: mvn clean package -Pproduction
       - name: Directory Build with Maven
-        run: mvn clean install -Pdirectory  
-        
-  formatting:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: axel-op/googlejavaformat-action@v3
-        with:
-          args: "--skip-javadoc-formatting --set-exit-if-changed"
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn clean install -Pdirectory

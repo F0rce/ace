@@ -357,8 +357,6 @@
     "construct-style-sheets-polyfill": "$construct-style-sheets-polyfill",
     "lit": "$lit",
     "@polymer/polymer": "$@polymer/polymer",
-    "chokidar": "$chokidar",
-    "@f0rce/lit-ace": "$@f0rce/lit-ace",
-    "date-fns": "$date-fns"
+    "chokidar": "$chokidar"
   }
 }

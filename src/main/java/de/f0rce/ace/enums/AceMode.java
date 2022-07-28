@@ -91,6 +91,7 @@ public enum AceMode {
   lobster_expert_search,
   lobster_logs,
   lobster_records,
+  lobster_srv_logs,
   logiql,
   logtalk,
   lsl,

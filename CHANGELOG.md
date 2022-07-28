@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.1](https://github.com/f0rce/ace/compare/v2.3.0...v2.3.1) (2022-07-28)
+
+
+### Features
+
+* **modes:** add lobster_dc_logs ([b902b59](https://github.com/f0rce/ace/commit/b902b59428209eb039a8e31a673221f619b7e6e8))
+* **modes:** add lobster_srv_logs ([d41ae6e](https://github.com/f0rce/ace/commit/d41ae6e630a70d0db5bc08759429993774dddbd8))
+
 ## [2.3.0](https://github.com/f0rce/ace/compare/v2.2.2...v2.3.0) (2022-07-20)
 
 

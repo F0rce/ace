@@ -4,7 +4,7 @@
 
 	<groupId>de.f0rce</groupId>
 	<artifactId>ace</artifactId>
-	<version>2.3.0</version>
+	<version>2.3.1</version>
 	<name>ace</name>
 	<description>Lit Wrap around the Ace Editor (https://ace.c9.io/) for Vaadin 14 and Vaadin 23</description>
 

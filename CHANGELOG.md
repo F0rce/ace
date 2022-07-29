@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [](https://github.com/f0rce/ace/compare/v3.3.1...v) (2022-07-29)
+
+
+### Bug Fixes
+
+* **modes:** improve lobster_srv_logs ([5d640c4](https://github.com/f0rce/ace/commit/5d640c4bd67721b1d6d582da6dd44d9a56b6512f))
+
 ## [3.3.1](https://github.com/f0rce/ace/compare/v3.3.0...v3.3.1) (2022-07-28)
 
 

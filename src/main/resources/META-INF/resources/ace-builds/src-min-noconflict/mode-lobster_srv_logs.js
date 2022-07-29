@@ -51,8 +51,19 @@ ace.define(
           },
           {
             token: "keyword",
-            regex: "^(\\d{2}:\\d{2}:\\d{2}){1}\\s+(?=(([a-zA-Z]+)?|([a-zA-Z]+:.*?)+(?!\\S)))?",
-            next: "handleType",
+            regex: "^\\d{2}:\\d{2}:\\d{2}(?=(\\s+[a-zA-Z0-9:\\-\\/[\\]()+@#]+))",
+          },
+          {
+            token: "meta.tag",
+            regex: "(?<=^\\d{2}:\\d{2}:\\d{2}\\s+)[a-zA-Z0-9:\\-\\/[\\]()+@#]+(?=\\s+[a-zA-Z0-9:\\-\\/[\\]()+@#]+\\s+.*$)",
+          },
+          {
+            token: "constant.language",
+            regex: "(?<=^\\d{2}:\\d{2}:\\d{2}\\s+[a-zA-Z0-9:\\-\\/[\\]()+@#]+\\s+)[a-zA-Z0-9:\\-\\/[\\]()+@#]+(?=(\\s+.*$))",
+          },
+          {
+            token: "constant.numeric",
+            regex: "(?<=^\\d{2}:\\d{2}:\\d{2}\\s+[a-zA-Z0-9:\\-\\/[\\]()+@#]+\\s+[a-zA-Z0-9:\\-\\/[\\]()+@#]+\\s+).*$",
           },
         ],
 
@@ -93,39 +104,6 @@ ace.define(
           },
           {
             defaultToken: "string",
-          },
-        ],
-
-        handleType: [
-          {
-            token: "meta.tag",
-            regex: "(([a-zA-Z]+)?|([a-zA-Z]+:.*?)+(?!\\S))\\s+(?=(\\w+:?)+)",
-            next: "handleOccurance",
-          },
-          {
-            defaultToken: "text",
-          },
-        ],
-
-        handleOccurance: [
-          {
-            token: "constant.language",
-            regex: "([a-zA-Z]+:.*?)+(?!\\S)",
-            next: "handleError",
-          },
-          {
-            defaultToken: "text",
-          },
-        ],
-
-        handleError: [
-          {
-            token: "constant.numeric",
-            regex: "(.*)?$",
-            next: "start",
-          },
-          {
-            defaultToken: "text",
           },
         ],
       };

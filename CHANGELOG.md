@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.3](https://github.com/f0rce/ace/compare/v3.3.2...v3.3.3) (2022-08-03)
+
+
+### Features
+
+* **themes:** add lobster_dark ([838ae0c](https://github.com/f0rce/ace/commit/838ae0cd7134f49c49ee62f396934d93c3741541))
+* **themes:** add lobster_light ([a0be74c](https://github.com/f0rce/ace/commit/a0be74cbb54cbfbb145b4efd446ccbcca193321e))
+
 ## [3.3.2](https://github.com/f0rce/ace/compare/v3.3.1...v3.3.2) (2022-07-29)
 
 

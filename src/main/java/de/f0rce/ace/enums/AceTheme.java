@@ -26,6 +26,7 @@ public enum AceTheme {
   katzenmilch,
   kr_theme,
   kuroir,
+  lobster_light,
   merbivore,
   merbivore_soft,
   monokai,

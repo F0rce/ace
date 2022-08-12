@@ -25,7 +25,17 @@ jobs:
         run: mvn clean package -Pproduction
       - name: Directory Build with Maven
         run: mvn clean install -Pdirectory
-      - name: Notify vaadin-add-ons
+        
+  notify:
+    name: 'Submodule Notify Parent'
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        shell: bash
+        
+    steps:
+      - name: 'Submodule Notify Parent'
         env: 
           CI_TOKEN: ${{ secrets.CI_TOKEN }}
           PARENT_REPO: F0rce/vaadin-add-ons

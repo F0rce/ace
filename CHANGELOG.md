@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.4.0](https://github.com/f0rce/ace/compare/v3.3.3...v3.4.0) (2022-08-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* autocompletion could not be called consecutively
+
+### Features
+
+* add gson as dependency to improve serialization ([8fa25a5](https://github.com/f0rce/ace/commit/8fa25a573573efe307e8a5ab072d3d7bec7dd48b))
+* **modes:** create & set custom modes during runtime ([0d28156](https://github.com/f0rce/ace/commit/0d28156ece02047e5773c10c4ab9d2f815661a86))
+
+
+### Bug Fixes
+
+* autocompletion could not be called consecutively ([a4aed41](https://github.com/f0rce/ace/commit/a4aed4182488c99a48c9ab3a21643fccb7e3a54e)), closes [#36](https://github.com/F0rce/ace/issues/36)
+
 ## [3.3.3](https://github.com/f0rce/ace/compare/v3.3.2...v3.3.3) (2022-08-03)
 
 

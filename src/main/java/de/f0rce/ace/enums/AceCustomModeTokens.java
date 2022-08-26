@@ -3,8 +3,10 @@ package de.f0rce.ace.enums;
 /**
  * The following are the common tokens to {@link AceTheme} taken from the TextMate manual. Note that
  * not all of these may have styling associated with them, depending on the {@link AceTheme} used.
- * </br></br>Ace
- * Documentation:</br><a>https://github.com/ajaxorg/ace/wiki/Creating-or-Extending-an-Edit-Mode#common-tokens</a>
+ * <br>
+ * <br>
+ * Ace Documentation:<br>
+ * <a>https://github.com/ajaxorg/ace/wiki/Creating-or-Extending-an-Edit-Mode#common-tokens</a>
  *
  * @author David "F0rce" Dodlek
  */
@@ -50,7 +52,7 @@ public enum AceCustomModeTokens {
   CONSTANT_NUMERIC("constant.numeric"),
 
   /**
-   * those which represent characters, e.g. <code>&lt;</code>, </code>\e</code>, <code>
+   * those which represent characters, e.g. <code>&lt;</code>, <code>\e</code>, <code>
    * \031</code>
    */
   CONSTANT_CHARACTER("constant.character"),
@@ -271,7 +273,7 @@ public enum AceCustomModeTokens {
   /**
    * Find the enum by it's {@link String} representation.
    *
-   * @param theme {@link String}
+   * @param token {@link String}
    * @return {@link AceCustomModeTokens}
    */
   public static AceCustomModeTokens findByToken(String token) {

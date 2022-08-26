@@ -19,7 +19,7 @@ public class AceStaticWordCompleter implements IAceWordCompleter {
 
   /**
    * @param words {@link List}
-   * @param keepCurrentCompleters boolean
+   * @param keepCompleters boolean
    */
   public AceStaticWordCompleter(List<String> words, boolean keepCompleters) {
     this(words, AceEditor.DEFAULT_STATIC_CATEGORY, keepCompleters);

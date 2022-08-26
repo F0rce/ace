@@ -801,7 +801,7 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   /**
    * Deprecated since v2.4.0 / v3.4.0! Please use {@link #addStaticWordCompleter(List)}.
    *
-   * @param wordList
+   * @param wordList {@link List}
    */
   @Deprecated
   public void setCustomAutocompletion(List<String> wordList) {
@@ -1539,7 +1539,7 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   /**
    * Add a dynamic word completer to the editor's autocompletion.
    *
-   * @param map {@link Map}
+   * @param dynamicWords {@link Map}
    * @param seperator {@link String}
    */
   public void addDynamicWordCompleter(Map<String, List<String>> dynamicWords, String seperator) {
@@ -1556,7 +1556,7 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   /**
    * Add a dynamic word completer to the editor's autocompletion.
    *
-   * @param map {@link Map}
+   * @param dynamicWords {@link Map}
    * @param seperator {@link String}
    * @param category {@link String}
    */
@@ -1575,7 +1575,7 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   /**
    * Add a dynamic word completer to the editor's autocompletion.
    *
-   * @param map {@link Map}
+   * @param dynamicWords {@link Map}
    * @param seperator {@link String}
    * @param keepCompleters boolean
    */
@@ -1600,7 +1600,7 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   /**
    * Add a dynamic word completer to the editor's autocompletion.
    *
-   * @param map {@link Map}
+   * @param dynamicWords {@link Map}
    * @param seperator {@link String}
    * @param category {@link String}
    * @param keepCompleters boolean
@@ -1759,9 +1759,10 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   }
 
   /**
-   * <strong>EXPERIMENTAL FEATURE</strong></br></br> Add a custom mode to the editor <strong>during
-   * runtime</strong> using {@link AceCustomMode}. After adding the mode, enable it with {@link
-   * #setCustomMode(String)}.
+   * <strong>EXPERIMENTAL FEATURE</strong><br>
+   * <br>
+   * Add a custom mode to the editor <strong>during runtime</strong> using {@link AceCustomMode}.
+   * After adding the mode, enable it with {@link #setCustomMode(String)}.
    *
    * @param name {@link String}
    * @param customMode {@link AceCustomMode}

@@ -57,7 +57,7 @@ public enum AceCustomModeTokens {
    */
   CONSTANT_CHARACTER("constant.character"),
 
-  /** escape sequences like </code>\e</code> */
+  /** escape sequences like <code>\e</code> */
   CONSTANT_CHARACTER_ESCAPE("constant.character.escape"),
 
   /**

@@ -30,6 +30,8 @@ public enum AceMode {
   csp,
   css,
   curly,
+  /** Do not use this mode. It is only there to show that a custom mode is currently being used. */
+  custom,
   c_cpp,
   d,
   dart,

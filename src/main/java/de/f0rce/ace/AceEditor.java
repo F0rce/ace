@@ -1,10 +1,14 @@
 package de.f0rce.ace;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import com.google.gson.Gson;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -29,10 +33,14 @@ import de.f0rce.ace.events.AceHTMLGeneratedEvent;
 import de.f0rce.ace.events.AceReady;
 import de.f0rce.ace.events.AceSelectionChanged;
 import de.f0rce.ace.events.AceValueChanged;
+import de.f0rce.ace.interfaces.IAceWordCompleter;
 import de.f0rce.ace.util.AceCursorPosition;
+import de.f0rce.ace.util.AceCustomMode;
+import de.f0rce.ace.util.AceDynamicWordCompleter;
 import de.f0rce.ace.util.AceJSON;
 import de.f0rce.ace.util.AceMarker;
 import de.f0rce.ace.util.AceSelection;
+import de.f0rce.ace.util.AceStaticWordCompleter;
 
 /** @author David "F0rce" Dodlek */
 @SuppressWarnings("serial")
@@ -71,6 +79,8 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   private boolean statusbarEnabled = true;
   private AceStatusbarIndexing statusbarIndexing = AceStatusbarIndexing.ONE_BASED;
   private List<IAceWordCompleter> customWordCompleter = new ArrayList<>();
+  private Map<String, AceCustomMode> customModes = new HashMap<>();
+  private String customMode = "";
 
   // Some internal checking
   private boolean hasBeenDetached = false;
@@ -124,6 +134,19 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
           }
         }
       }
+      if (!this.customModes.isEmpty()) {
+        Iterator<String> it = this.customModes.keySet().iterator();
+
+        while (it.hasNext()) {
+          String key = it.next();
+          AceCustomMode value = this.customModes.get(key);
+
+          this.getElement().callJsFunction("addCustomMode", key, new Gson().toJson(value));
+        }
+      }
+      if (!this.customMode.isBlank() && !this.customMode.isEmpty()) {
+        this.setCustomMode(this.customMode);
+      }
       this.hasBeenDetached = false;
     }
   }
@@ -168,8 +191,11 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
    * @param mode {@link AceMode}
    */
   public void setMode(AceMode mode) {
+    if (mode.equals(AceMode.custom)) return;
+
     this.getElement().setProperty("mode", mode.toString());
     this.mode = mode;
+    this.customMode = "";
   }
 
   /**
@@ -1730,5 +1756,41 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
    */
   public AceStatusbarIndexing getStatusbarIndexing() {
     return this.statusbarIndexing;
+  }
+
+  /**
+   * <strong>EXPERIMENTAL FEATURE</strong></br></br> Add a custom mode to the editor <strong>during
+   * runtime</strong> using {@link AceCustomMode}. After adding the mode, enable it with {@link
+   * #setCustomMode(String)}.
+   *
+   * @param name {@link String}
+   * @param customMode {@link AceCustomMode}
+   */
+  public void addCustomMode(String name, AceCustomMode customMode) {
+    this.getElement().callJsFunction("addCustomMode", name, new Gson().toJson(customMode));
+    this.customModes.put(name, customMode);
+  }
+
+  /**
+   * Returns a map of the custom modes added via {@link #addCustomMode(String, AceCustomMode)}.
+   *
+   * @return {@link Map}
+   */
+  public Map<String, AceCustomMode> getCustomModes() {
+    return this.customModes;
+  }
+
+  /**
+   * Same as {@link #setMode(AceMode)} just for enabling modes added via {@link
+   * #addCustomMode(String, AceCustomMode)}.
+   *
+   * @param customMode {@link String}
+   */
+  public void setCustomMode(String customMode) {
+    if (this.customModes.containsKey(customMode)) {
+      this.getElement().callJsFunction("setCustomMode", customMode);
+      this.mode = AceMode.custom;
+      this.customMode = customMode;
+    }
   }
 }

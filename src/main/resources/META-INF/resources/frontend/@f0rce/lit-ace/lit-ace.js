@@ -37,13 +37,11 @@ class LitAce extends LitElement {
       displayIndentGuides: { type: Boolean },
       highlightSelectedWord: { type: Boolean },
       useWorker: { type: Boolean },
-      customAutocompletion: { type: String },
       marker: { type: String }, // TODO: remove this, use markerList instead
       markerList: { type: Array }, // TODO: kepp this, backend should create a json with all markers
       rmMarker: { type: String }, // TODO: use method
       statusbarEnabled: { type: Boolean },
       enableSnippets: { type: Boolean },
-      dynamicAutocompletion: { type: String },
     };
   }
 
@@ -196,6 +194,8 @@ class LitAce extends LitElement {
     this.editor.beautify = ace.require("ace/ext/beautify");
     this.statusBar = ace.require("ace/ext/statusbar").StatusBar;
     this.snippetManager = ace.require("ace/snippets").snippetManager;
+
+    this._customModes = new Map();
 
     let self = this;
 
@@ -470,33 +470,6 @@ class LitAce extends LitElement {
     this.editor.renderer.setShowGutter(this.showGutter);
   }
 
-  customAutocompletionChanged() {
-    if (this.editor == undefined) {
-      return;
-    }
-
-    const parsed = JSON.parse(this.customAutocompletion);
-    const category = parsed.category;
-    const wordlist = parsed.wordlist;
-
-    var staticWordCompleter = {
-      getCompletions: function (editor, session, pos, prefix, callback) {
-        callback(
-          null,
-          wordlist.map(function (word) {
-            return { name: word, value: word, score: 10, meta: category };
-          })
-        );
-      },
-    };
-
-    if (parsed.keepcompleters) {
-      this.editor.completers.push(staticWordCompleter);
-    } else {
-      this.editor.completers = [staticWordCompleter];
-    }
-  }
-
   markerChanged() {
     if (this.editor == undefined) {
       return;
@@ -608,70 +581,6 @@ class LitAce extends LitElement {
           }
         }
       }
-    }
-  }
-
-  dynamicAutocompletionChanged() {
-    if (this.editor == undefined) {
-      return;
-    }
-
-    const parsed = JSON.parse(this.dynamicAutocompletion);
-    const seperator = parsed.seperator;
-    const list = parsed.list;
-    const keys = Object.keys(list);
-    const defaultCallback = keys.map(function (word) {
-      return {
-        name: word,
-        value: word,
-        score: 50,
-        meta: parsed.category,
-      };
-    });
-
-    var dynamicCompletion = {
-      getCompletions: function (editor, session, pos, prefix, callback) {
-        var curLine = session.getDocument().getLine(pos.row);
-        var curTokens = curLine.slice(0, pos.column).split(/\s+/);
-        var curCmd = curTokens[curTokens.length - 1];
-        if (!curCmd) {
-          callback(null, defaultCallback);
-          return;
-        }
-        const seperatorReplaced = seperator.replace(
-          /[-\/\\^$*+?.()|[\]{}]/g,
-          "\\$&"
-        );
-        var canidates = [];
-        const match = curCmd.match(
-          new RegExp(`(${keys.join("|")}){1}(?=${seperatorReplaced})`, "i")
-        );
-        if (match) {
-          const keyword = match[0];
-          for (var option of list[keyword]) {
-            canidates.push(keyword + seperator + option);
-          }
-          callback(
-            null,
-            canidates.map(function (option) {
-              return {
-                name: option,
-                value: option,
-                score: 100,
-                meta: keyword,
-              };
-            })
-          );
-        } else {
-          callback(null, defaultCallback);
-        }
-      },
-    };
-
-    if (parsed.keepcompleters) {
-      this.editor.completers.push(dynamicCompletion);
-    } else {
-      this.editor.completers = [dynamicCompletion];
     }
   }
 
@@ -1221,6 +1130,188 @@ class LitAce extends LitElement {
     this.editor.statusbar.updateStatus(this.editor, this._statusbarIndex);
   }
 
+  addStaticWordCompleter(json) {
+    if (this.editor == undefined) {
+      this.addEventListener(
+        "editor-ready",
+        () => this._addStaticWordCompleter(json),
+        {
+          once: true,
+        }
+      );
+    } else {
+      this._addStaticWordCompleter(json);
+    }
+  }
+
+  /** @private */
+  _addStaticWordCompleter(json) {
+    const parsed = JSON.parse(json);
+    const category = parsed.category;
+    const words = parsed.words;
+
+    var staticWordCompleter = {
+      getCompletions: function (editor, session, pos, prefix, callback) {
+        callback(
+          null,
+          words.map(function (word) {
+            return { name: word, value: word, score: 10, meta: category };
+          })
+        );
+      },
+    };
+
+    if (parsed.keepCompleters) {
+      this.editor.completers.push(staticWordCompleter);
+    } else {
+      this.editor.completers = [staticWordCompleter];
+    }
+  }
+
+  addDynamicWordCompleter(json) {
+    if (this.editor == undefined) {
+      this.addEventListener(
+        "editor-ready",
+        () => this._addDynamicWordCompleter(json),
+        {
+          once: true,
+        }
+      );
+    } else {
+      this._addDynamicWordCompleter(json);
+    }
+  }
+
+  /** @private */
+  _addDynamicWordCompleter(json) {
+    const parsed = JSON.parse(json);
+    const seperator = parsed.seperator;
+    const list = parsed.dynamicWords;
+    const keys = Object.keys(list);
+    const defaultCallback = keys.map(function (word) {
+      return {
+        name: word,
+        value: word,
+        score: 50,
+        meta: parsed.category,
+      };
+    });
+
+    var dynamicCompletion = {
+      getCompletions: function (editor, session, pos, prefix, callback) {
+        var curLine = session.getDocument().getLine(pos.row);
+        var curTokens = curLine.slice(0, pos.column).split(/\s+/);
+        var curCmd = curTokens[curTokens.length - 1];
+        if (!curCmd) {
+          callback(null, defaultCallback);
+          return;
+        }
+        const seperatorReplaced = seperator.replace(
+          /[-\/\\^$*+?.()|[\]{}]/g,
+          "\\$&"
+        );
+        var canidates = [];
+        const match = curCmd.match(
+          new RegExp(`(${keys.join("|")}){1}(?=${seperatorReplaced})`, "i")
+        );
+        if (match) {
+          const keyword = match[0];
+          for (var option of list[keyword]) {
+            canidates.push(keyword + seperator + option);
+          }
+          callback(
+            null,
+            canidates.map(function (option) {
+              return {
+                name: option,
+                value: option,
+                score: 100,
+                meta: keyword,
+              };
+            })
+          );
+        } else {
+          callback(null, defaultCallback);
+        }
+      },
+    };
+
+    if (parsed.keepCompleters) {
+      this.editor.completers.push(dynamicCompletion);
+    } else {
+      this.editor.completers = [dynamicCompletion];
+    }
+  }
+
+  addCustomMode(name, json) {
+    if (this.editor == undefined) {
+      this.addEventListener(
+        "editor-ready",
+        () => this._addCustomMode(name, json),
+        {
+          once: true,
+        }
+      );
+    } else {
+      this._addCustomMode(name, json);
+    }
+  }
+
+  /** @private */
+  _addCustomMode(name, json) {
+    let parsed;
+    try {
+      parsed = JSON.parse(json);
+    } catch (e) {
+      return;
+    }
+
+    var customModeFunction = function () {
+      this.$rules = parsed.states;
+
+      this.normalizeRules();
+    }
+
+    try {
+      ace.require("ace/lib/oop").inherits(customModeFunction, ace.require("ace/mode/text_highlight_rules").TextHighlightRules);
+    } catch (error) {
+      console.error(error)
+      return;
+    }
+
+    var TextMode = ace.require("ace/mode/text").Mode;
+
+    var customMode = new TextMode();
+    customMode.HighlightRules = customModeFunction;
+
+    this._customModes.set(name, customMode);
+  }
+
+  setCustomMode(mode) {
+    if (this.editor == undefined) {
+      this.addEventListener(
+        "editor-ready",
+        () => this._setCustomMode(mode),
+        {
+          once: true,
+        }
+      );
+    } else {
+      this._setCustomMode(mode);
+    }
+  }
+
+  /** @private */
+  _setCustomMode(mode) {
+    if (this._customModes.has(mode)) {
+      try {
+        this.editor.getSession().setMode(this._customModes.get(mode));
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+
   /** @private */
   _createSelectionObject() {
     let editor = this.editor;
@@ -1357,13 +1448,13 @@ class LitAce extends LitElement {
     const width = window.innerWidth
       ? window.innerWidth
       : document.documentElement.clientWidth
-      ? document.documentElement.clientWidth
-      : screen.width;
+        ? document.documentElement.clientWidth
+        : screen.width;
     const height = window.innerHeight
       ? window.innerHeight
       : document.documentElement.clientHeight
-      ? document.documentElement.clientHeight
-      : screen.height;
+        ? document.documentElement.clientHeight
+        : screen.height;
 
     const systemZoom = width / window.screen.availWidth;
     const left = (width - popupWidth) / 2 / systemZoom + dualScreenLeft;
@@ -1372,8 +1463,7 @@ class LitAce extends LitElement {
     var mywindow = window.open(
       "",
       "_blank",
-      `toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,copyhistory=no,height=${
-        popupHeight / systemZoom
+      `toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,copyhistory=no,height=${popupHeight / systemZoom
       },width=${popupWidth / systemZoom},top=${top},left=${left}`
     );
 

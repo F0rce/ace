@@ -1,6 +1,6 @@
 {
   "name": "@f0rce/lit-ace",
-  "version": "1.10.1",
+  "version": "1.11.0",
   "description": "Lit-Element Wrapper around the Ace Editor (https://ace.c9.io/)",
   "main": "lit-ace.js",
   "scripts": {
@@ -19,8 +19,8 @@
   },
   "homepage": "https://github.com/f0rce/lit-ace#readme",
   "dependencies": {
-    "@f0rce/ace-builds": "^1.8.1",
-    "lit": "^2.2.8"
+    "@f0rce/ace-builds": "^1.9.6",
+    "lit": "^2.3.1"
   },
   "devDependencies": {
     "@types/ace": "^0.0.47",

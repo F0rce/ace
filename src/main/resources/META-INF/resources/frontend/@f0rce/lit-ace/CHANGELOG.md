@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.11.0](https://github.com/f0rce/lit-ace/compare/v1.10.1...v1.11.0) (2022-08-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* autocompletion could not be called consecutively
+
+### Features
+
+* add custom modes during runtime ([3cb851a](https://github.com/f0rce/lit-ace/commit/3cb851aeb28122085bf77a003865d6fef65027e9))
+
+
+### Bug Fixes
+
+* autocompletion could not be called consecutively ([f0ca944](https://github.com/f0rce/lit-ace/commit/f0ca94457d998073c01d00952c29a0f6bea1da89))
+
 ### [1.10.1](https://github.com/f0rce/lit-ace/compare/v1.10.0...v1.10.1) (2022-07-27)
 
 ## [1.10.0](https://github.com/f0rce/lit-ace/compare/v1.9.0...v1.10.0) (2022-07-20)

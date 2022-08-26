@@ -5,6 +5,7 @@ import de.f0rce.ace.events.AceForceSyncDomEvent;
 import de.f0rce.ace.events.AceSelectionChanged;
 import elemental.json.JsonObject;
 
+/** @author David "F0rce" Dodlek */
 public class AceCursorPosition {
 
   private int row;

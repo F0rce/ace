@@ -41,6 +41,9 @@ import de.f0rce.ace.util.AceSelection;
 @JsModule("./@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends Component implements HasSize, HasStyle, Focusable<AceEditor> {
 
+  public static final String DEFAULT_STATIC_CATEGORY = "keyword";
+  public static final String DEFAULT_DYNAMIC_CATEGORY = "dynamic";
+
   private AceTheme theme = AceTheme.eclipse;
   private AceMode mode = AceMode.javascript;
   private String value = "";
@@ -64,10 +67,10 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   private boolean useWorker = false;
   private boolean liveAutocompletion = false;
   private boolean enableSnippets = false;
-  private List<String> customAutocompletion = new ArrayList<String>();
   private List<AceMarker> markers = new ArrayList<AceMarker>();
   private boolean statusbarEnabled = true;
   private AceStatusbarIndexing statusbarIndexing = AceStatusbarIndexing.ONE_BASED;
+  private List<IAceWordCompleter> customWordCompleter = new ArrayList<>();
 
   // Some internal checking
   private boolean hasBeenDetached = false;
@@ -100,8 +103,8 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
 
   @Override
   protected void onAttach(AttachEvent attachEvent) {
-    // TODO: rework customAutocompletion, dynamicAutocompletion & markers to be refreshed in here
-    // aswell
+    // TODO: rework markers to be refreshed in here aswell (to allow multiple setting of markers at
+    // the same time)
     if (this.hasBeenDetached) {
       if (!this.value.equals("")) {
         this.setValue(this.value);
@@ -111,6 +114,15 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
       }
       if (this.statusbarIndexing != AceStatusbarIndexing.ONE_BASED) {
         this.setStatusbarIndexing(this.statusbarIndexing);
+      }
+      if (!this.customWordCompleter.isEmpty()) {
+        for (IAceWordCompleter completer : this.customWordCompleter) {
+          if (completer instanceof AceStaticWordCompleter) {
+            this.getElement().callJsFunction("addStaticWordCompleter", completer.toJSON());
+          } else if (completer instanceof AceDynamicWordCompleter) {
+            this.getElement().callJsFunction("addDynamicWordCompleter", completer.toJSON());
+          }
+        }
       }
       this.hasBeenDetached = false;
     }
@@ -761,88 +773,184 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   }
 
   /**
-   * Sets a custom autocompletion list for the editor.
+   * Deprecated since v2.4.0 / v3.4.0! Please use {@link #addStaticWordCompleter(List)}.
    *
-   * @param wordList {@link List}
+   * @param wordList
    */
+  @Deprecated
   public void setCustomAutocompletion(List<String> wordList) {
-    if (wordList.size() == 0) {
-      return;
-    }
-    this.getElement()
-        .setProperty("customAutocompletion", AceJSON.generateCustomAutocompletionJSON(wordList));
-    this.customAutocompletion = wordList;
+    this.addStaticWordCompleter(wordList);
   }
 
   /**
-   * Sets a custom autocompletion list for the editor and optionally keeps the current completers.
+   * Deprecated since v2.4.0 / v3.4.0! Please use {@link #addStaticWordCompleter(List, boolean)}.
    *
    * @param wordList {@link List}
    * @param keepCurrentCompleters boolean
    */
+  @Deprecated
   public void setCustomAutocompletion(List<String> wordList, boolean keepCurrentCompleters) {
-    if (wordList.size() == 0) {
-      return;
-    }
-    this.getElement()
-        .setProperty(
-            "customAutocompletion",
-            AceJSON.generateCustomAutocompletionJSON(wordList, keepCurrentCompleters));
-    if (keepCurrentCompleters) {
-      this.customAutocompletion.addAll(wordList);
-    } else {
-      this.customAutocompletion = wordList;
-    }
+    this.addStaticWordCompleter(wordList, keepCurrentCompleters);
   }
 
   /**
-   * Sets a custom autocompletion list for the editor and sets the category aswell (default:
-   * "keyword").
+   * Deprecated since v2.4.0 / v3.4.0! Please use {@link #addStaticWordCompleter(List, String)}.
    *
    * @param wordList {@link List}
    * @param category {@link String}
    */
+  @Deprecated
   public void setCustomAutocompletion(List<String> wordList, String category) {
-    if (wordList.size() == 0) {
-      return;
-    }
-    this.getElement()
-        .setProperty(
-            "customAutocompletion", AceJSON.generateCustomAutocompletionJSON(wordList, category));
-    this.customAutocompletion = wordList;
+    this.addStaticWordCompleter(wordList, category);
   }
 
   /**
-   * Sets a custom autocompletion list for the editor, sets the category (default: "keyword") and
-   * optionally keeps the current completers.
+   * Deprecated since v2.4.0 / v3.4.0! Please use {@link #addStaticWordCompleter(List, String,
+   * boolean)}.
    *
    * @param wordList {@link List}
    * @param category {@link String}
    * @param keepCurrentCompleters boolean
    */
+  @Deprecated
   public void setCustomAutocompletion(
       List<String> wordList, String category, boolean keepCurrentCompleters) {
-    if (wordList.size() == 0) {
-      return;
-    }
-    this.getElement()
-        .setProperty(
-            "customAutocompletion",
-            AceJSON.generateCustomAutocompletionJSON(wordList, category, keepCurrentCompleters));
-    if (keepCurrentCompleters) {
-      this.customAutocompletion.addAll(wordList);
-    } else {
-      this.customAutocompletion = wordList;
-    }
+    this.addStaticWordCompleter(wordList, category, keepCurrentCompleters);
   }
 
   /**
-   * Returns a {@link List} of the current custom autocompletion for the editor.
+   * Deprecated since v2.4.0 / v3.4.0! Please use {@link #getStaticWordCompleter()}.
    *
    * @return {@link List}
    */
+  @Deprecated
   public List<String> getCustomAutocompletion() {
-    return this.customAutocompletion;
+
+    ArrayList<String> words = new ArrayList<>();
+
+    for (IAceWordCompleter completer : this.customWordCompleter) {
+      if (completer instanceof AceStaticWordCompleter) {
+        AceStaticWordCompleter aswc = (AceStaticWordCompleter) completer;
+
+        words.addAll(aswc.getWords());
+      }
+    }
+
+    return words;
+  }
+
+  /**
+   * Add a static word completer to the editor's autocompletion.
+   *
+   * @param words {@link List}
+   */
+  public void addStaticWordCompleter(List<String> words) {
+    if (words.size() == 0) {
+      return;
+    }
+
+    AceStaticWordCompleter aswc = new AceStaticWordCompleter(words);
+
+    this.getElement().callJsFunction("addStaticWordCompleter", aswc.toJSON());
+    this.customWordCompleter = new ArrayList<>(Arrays.asList(aswc));
+  }
+
+  /**
+   * Add a static word completer to the editor's autocompletion.
+   *
+   * @param words {@link List}
+   * @param keepCompleters boolean
+   */
+  public void addStaticWordCompleter(List<String> words, boolean keepCompleters) {
+    if (words.size() == 0) {
+      return;
+    }
+
+    AceStaticWordCompleter aswc = new AceStaticWordCompleter(words, keepCompleters);
+
+    this.getElement().callJsFunction("addStaticWordCompleter", aswc.toJSON());
+
+    if (keepCompleters) {
+      this.customWordCompleter.add(aswc);
+    } else {
+      this.customWordCompleter = new ArrayList<>(Arrays.asList(aswc));
+    }
+  }
+
+  /**
+   * Add a static word completer to the editor's autocompletion.
+   *
+   * @param words {@link List}
+   * @param category {@link String}
+   */
+  public void addStaticWordCompleter(List<String> words, String category) {
+    if (words.size() == 0) {
+      return;
+    }
+
+    AceStaticWordCompleter aswc = new AceStaticWordCompleter(words, category);
+
+    this.getElement().callJsFunction("addStaticWordCompleter", aswc.toJSON());
+    this.customWordCompleter = new ArrayList<>(Arrays.asList(aswc));
+  }
+
+  /**
+   * Add a static word completer to the editor's autocompletion.
+   *
+   * @param words {@link List}
+   * @param category {@link String}
+   * @param keepCompleters boolean
+   */
+  public void addStaticWordCompleter(List<String> words, String category, boolean keepCompleters) {
+    if (words.size() == 0) {
+      return;
+    }
+
+    AceStaticWordCompleter aswc = new AceStaticWordCompleter(words, category, keepCompleters);
+
+    this.getElement().callJsFunction("addStaticWordCompleter", aswc.toJSON());
+
+    if (keepCompleters) {
+      this.customWordCompleter.add(aswc);
+    } else {
+      this.customWordCompleter = new ArrayList<>(Arrays.asList(aswc));
+    }
+  }
+
+  /**
+   * Add a static word completer to the editor's autocompletion.
+   *
+   * @param staticWordCompleter {@link AceStaticWordCompleter}
+   */
+  public void addStaticWordCompleter(AceStaticWordCompleter staticWordCompleter) {
+    if (staticWordCompleter.getWords().isEmpty()) {
+      return;
+    }
+
+    this.getElement().callJsFunction("addStaticWordCompleter", staticWordCompleter.toJSON());
+
+    if (staticWordCompleter.isKeepCompleters()) {
+      this.customWordCompleter.add(staticWordCompleter);
+    } else {
+      this.customWordCompleter = new ArrayList<>(Arrays.asList(staticWordCompleter));
+    }
+  }
+
+  /**
+   * Returns a {@link List} of the current static word completer used in the editor.
+   *
+   * @return {@link List}
+   */
+  public List<AceStaticWordCompleter> getStaticWordCompleter() {
+    ArrayList<AceStaticWordCompleter> staticCompleter = new ArrayList<>();
+
+    for (IAceWordCompleter completer : this.customWordCompleter) {
+      if (completer instanceof AceStaticWordCompleter) {
+        staticCompleter.add((AceStaticWordCompleter) completer);
+      }
+    }
+
+    return staticCompleter;
   }
 
   /**
@@ -861,6 +969,7 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
    */
   public void disableCustomAutocompletion(boolean useDefault) {
     this.getElement().callJsFunction("disableCustomAutocompletion", useDefault);
+    this.customWordCompleter = new ArrayList<>();
   }
 
   /**
@@ -1263,16 +1372,6 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   }
 
   /**
-   * @deprecated As of release 2.0.0, please use {@link #getSelection()} and {@link
-   *     AceSelection#getSelectedText()}
-   * @return {@link String}
-   */
-  @Deprecated
-  public String getSelectedText() {
-    return this.getSelection().getSelectedText();
-  }
-
-  /**
    * Folds all fold marker in the editor. (Created automatically when an if is added for example).
    */
   public void foldAll() {
@@ -1358,55 +1457,192 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   }
 
   /**
-   * Adds a dynamic autocompletion to the editor's autocompletion.
+   * Deprecated since v2.4.0 / v3.4.0! Please use {@link #addDynamicWordCompleter(Map, String)}.
    *
    * @param map {@link Map}
    * @param seperator {@link String}
    */
+  @Deprecated
   public void addDynamicAutocompletion(Map<String, List<String>> map, String seperator) {
-    String json = AceJSON.generateDynamicAutocompletionJSON(map, seperator);
-    this.getElement().setProperty("dynamicAutocompletion", json);
+    this.addDynamicWordCompleter(map, seperator);
   }
 
   /**
-   * Adds a dynamic autocompletion to the editor's autocompletion.
+   * Deprecated since v2.4.0 / v3.4.0! Please use {@link #addDynamicWordCompleter(Map, String,
+   * String)}.
    *
    * @param map {@link Map}
    * @param seperator {@link String}
    * @param category {@link String}
    */
+  @Deprecated
   public void addDynamicAutocompletion(
       Map<String, List<String>> map, String seperator, String category) {
-    String json = AceJSON.generateDynamicAutocompletionJSON(map, seperator, category);
-    this.getElement().setProperty("dynamicAutocompletion", json);
+    this.addDynamicWordCompleter(map, seperator, category);
   }
 
   /**
-   * Adds a dynamic autocompletion to the editor's autocompletion.
+   * Deprecated since v2.4.0 / v3.4.0! Please use {@link #addDynamicWordCompleter(Map, String,
+   * boolean)}.
    *
    * @param map {@link Map}
    * @param seperator {@link String}
    * @param keepCompleters boolean
    */
+  @Deprecated
   public void addDynamicAutocompletion(
       Map<String, List<String>> map, String seperator, boolean keepCompleters) {
-    String json = AceJSON.generateDynamicAutocompletionJSON(map, seperator, keepCompleters);
-    this.getElement().setProperty("dynamicAutocompletion", json);
+    this.addDynamicAutocompletion(map, seperator, keepCompleters);
   }
 
   /**
-   * Adds a dynamic autocompletion to the editor's autocompletion.
+   * Deprecated since v2.4.0 / v3.4.0! Please use {@link #addDynamicWordCompleter(Map, String,
+   * String, boolean)}.
    *
    * @param map {@link Map}
    * @param seperator {@link String}
    * @param category {@link String}
    * @param keepCompleters boolean
    */
+  @Deprecated
   public void addDynamicAutocompletion(
       Map<String, List<String>> map, String seperator, String category, boolean keepCompleters) {
-    String json =
-        AceJSON.generateDynamicAutocompletionJSON(map, seperator, category, keepCompleters);
-    this.getElement().setProperty("dynamicAutocompletion", json);
+    this.addDynamicWordCompleter(map, seperator, category, keepCompleters);
+  }
+
+  /**
+   * Add a dynamic word completer to the editor's autocompletion.
+   *
+   * @param map {@link Map}
+   * @param seperator {@link String}
+   */
+  public void addDynamicWordCompleter(Map<String, List<String>> dynamicWords, String seperator) {
+    if (dynamicWords.isEmpty()) {
+      return;
+    }
+
+    AceDynamicWordCompleter adwc = new AceDynamicWordCompleter(dynamicWords, seperator);
+
+    this.getElement().callJsFunction("addDynamicWordCompleter", adwc.toJSON());
+    this.customWordCompleter = new ArrayList<>(Arrays.asList(adwc));
+  }
+
+  /**
+   * Add a dynamic word completer to the editor's autocompletion.
+   *
+   * @param map {@link Map}
+   * @param seperator {@link String}
+   * @param category {@link String}
+   */
+  public void addDynamicWordCompleter(
+      Map<String, List<String>> dynamicWords, String seperator, String category) {
+    if (dynamicWords.isEmpty()) {
+      return;
+    }
+
+    AceDynamicWordCompleter adwc = new AceDynamicWordCompleter(dynamicWords, seperator, category);
+
+    this.getElement().callJsFunction("addDynamicWordCompleter", adwc.toJSON());
+    this.customWordCompleter = new ArrayList<>(Arrays.asList(adwc));
+  }
+
+  /**
+   * Add a dynamic word completer to the editor's autocompletion.
+   *
+   * @param map {@link Map}
+   * @param seperator {@link String}
+   * @param keepCompleters boolean
+   */
+  public void addDynamicWordCompleter(
+      Map<String, List<String>> dynamicWords, String seperator, boolean keepCompleters) {
+    if (dynamicWords.isEmpty()) {
+      return;
+    }
+
+    AceDynamicWordCompleter adwc =
+        new AceDynamicWordCompleter(dynamicWords, seperator, keepCompleters);
+
+    this.getElement().callJsFunction("addDynamicWordCompleter", adwc.toJSON());
+
+    if (keepCompleters) {
+      this.customWordCompleter.add(adwc);
+    } else {
+      this.customWordCompleter = new ArrayList<>(Arrays.asList(adwc));
+    }
+  }
+
+  /**
+   * Add a dynamic word completer to the editor's autocompletion.
+   *
+   * @param map {@link Map}
+   * @param seperator {@link String}
+   * @param category {@link String}
+   * @param keepCompleters boolean
+   */
+  public void addDynamicWordCompleter(
+      Map<String, List<String>> dynamicWords,
+      String seperator,
+      String category,
+      boolean keepCompleters) {
+    if (dynamicWords.isEmpty()) {
+      return;
+    }
+
+    AceDynamicWordCompleter adwc =
+        new AceDynamicWordCompleter(dynamicWords, seperator, category, keepCompleters);
+
+    this.getElement().callJsFunction("addDynamicWordCompleter", adwc.toJSON());
+
+    if (keepCompleters) {
+      this.customWordCompleter.add(adwc);
+    } else {
+      this.customWordCompleter = new ArrayList<>(Arrays.asList(adwc));
+    }
+  }
+
+  /**
+   * Add a dynamic word completer to the editor's autocompletion.
+   *
+   * @param dynamicWordCompleter {@link AceDynamicWordCompleter}
+   */
+  public void addDynamicWordCompleter(AceDynamicWordCompleter dynamicWordCompleter) {
+    if (dynamicWordCompleter.getDynamicWords().isEmpty()) {
+      return;
+    }
+
+    this.getElement().callJsFunction("addStaticWordCompleter", dynamicWordCompleter.toJSON());
+
+    if (dynamicWordCompleter.isKeepCompleters()) {
+      this.customWordCompleter.add(dynamicWordCompleter);
+    } else {
+      this.customWordCompleter = new ArrayList<>(Arrays.asList(dynamicWordCompleter));
+    }
+  }
+
+  /**
+   * Returns a {@link List} of the current dynamic word completer used in the editor.
+   *
+   * @return {@link List}
+   */
+  public List<AceDynamicWordCompleter> getDynamicWordCompleter() {
+    ArrayList<AceDynamicWordCompleter> dynamicCompleter = new ArrayList<>();
+
+    for (IAceWordCompleter completer : this.customWordCompleter) {
+      if (completer instanceof AceDynamicWordCompleter) {
+        dynamicCompleter.add((AceDynamicWordCompleter) completer);
+      }
+    }
+
+    return dynamicCompleter;
+  }
+
+  /**
+   * Returns a list of all word completer used in the editor.
+   *
+   * @return {@link List}
+   */
+  public List<IAceWordCompleter> getWordCompleter() {
+    return this.customWordCompleter;
   }
 
   /** Open the autocompletion dialog programatically. */

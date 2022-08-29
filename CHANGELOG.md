@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.4.1](https://github.com/f0rce/ace/compare/v3.4.0...v3.4.1) (2022-08-29)
+
+
+### Bug Fixes
+
+* add missing "meta.tag" ([6007aba](https://github.com/f0rce/ace/commit/6007abadb2b1b900b7e11014d12c479bf1ee4487))
+
 ## [3.4.0](https://github.com/f0rce/ace/compare/v3.3.3...v3.4.0) (2022-08-26)
 
 

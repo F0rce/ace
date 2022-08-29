@@ -21,7 +21,6 @@
     "@vaadin/common-frontend": "0.0.17",
     "@vaadin/component-base": "23.1.6",
     "@vaadin/context-menu": "23.1.6",
-    "@vaadin/cookie-consent": "23.1.6",
     "@vaadin/custom-field": "23.1.6",
     "@vaadin/date-picker": "23.1.6",
     "@vaadin/date-time-picker": "23.1.6",
@@ -67,7 +66,6 @@
     "@vaadin/vaadin-checkbox": "23.1.6",
     "@vaadin/vaadin-combo-box": "23.1.6",
     "@vaadin/vaadin-context-menu": "23.1.6",
-    "@vaadin/vaadin-cookie-consent": "23.1.6",
     "@vaadin/vaadin-custom-field": "23.1.6",
     "@vaadin/vaadin-date-picker": "23.1.6",
     "@vaadin/vaadin-date-time-picker": "23.1.6",
@@ -151,7 +149,6 @@
       "@vaadin/common-frontend": "0.0.17",
       "@vaadin/component-base": "23.1.6",
       "@vaadin/context-menu": "23.1.6",
-      "@vaadin/cookie-consent": "23.1.6",
       "@vaadin/custom-field": "23.1.6",
       "@vaadin/date-picker": "23.1.6",
       "@vaadin/date-time-picker": "23.1.6",
@@ -196,7 +193,6 @@
       "@vaadin/vaadin-checkbox": "23.1.6",
       "@vaadin/vaadin-combo-box": "23.1.6",
       "@vaadin/vaadin-context-menu": "23.1.6",
-      "@vaadin/vaadin-cookie-consent": "23.1.6",
       "@vaadin/vaadin-custom-field": "23.1.6",
       "@vaadin/vaadin-date-picker": "23.1.6",
       "@vaadin/vaadin-date-time-picker": "23.1.6",
@@ -259,7 +255,7 @@
       "workbox-precaching": "6.5.0",
       "workbox-webpack-plugin": "6.5.0"
     },
-    "hash": "33c8728911d5ba845e725f1fec4ca3f3b3101718fa3503ccd0b38a48502a49a0"
+    "hash": "1751bb2045583e969915a21b7e79ede1ecada1619656b4fa95ccdb2da5949de0"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",

@@ -61,7 +61,7 @@ public enum AceCustomModeTokens {
   CONSTANT_CHARACTER_ESCAPE("constant.character.escape"),
 
   /**
-   * constants (generally) provided by the language which are "special" like <code>true</code>,
+   * constants (generally) provided by the language which are "special" like <code>true</code>,
    * <code>false</code>, <code>nil</code>, <code>YES</code>, <code>NO</code>, etc.
    */
   CONSTANT_LANGUAGE("constant.language"),
@@ -72,8 +72,8 @@ public enum AceCustomModeTokens {
   /**
    * an entity refers to a larger part of the document, for example a chapter, class, function, or
    * tag. We do not scope the entire entity as <code>ENTITY.*</code> (we use <code>META.*</code> for
-   * that). But we do use <code>entity.*</code> for the "placeholders" in the larger entity, e.g.
-   * if the entity is a chapter, we would use {@link #ENTITY_NAME_SECTION} for the chapter title.
+   * that). But we do use <code>entity.*</code> for the "placeholders" in the larger entity, e.g. if
+   * the entity is a chapter, we would use {@link #ENTITY_NAME_SECTION} for the chapter title.
    */
   ENTITY("entity"),
 
@@ -174,6 +174,8 @@ public enum AceCustomModeTokens {
 
   /** other markup constructs */
   MARKUP_OTHER("markup.other"),
+
+  META_TAG("meta.tag"),
 
   /** things relating to "storage" */
   STORAGE("storage"),

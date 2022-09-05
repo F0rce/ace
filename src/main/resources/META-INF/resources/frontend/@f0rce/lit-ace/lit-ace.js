@@ -15,6 +15,7 @@ import "@f0rce/ace-builds/src-noconflict/ext-beautify.js";
 import "@f0rce/ace-builds/src-noconflict/ext-statusbar.js";
 import "@f0rce/ace-builds/src-noconflict/snippets/snippets.js";
 
+const CUSTOM_KEYWORD = "custom";
 class LitAce extends LitElement {
   static get properties() {
     return {
@@ -327,9 +328,10 @@ class LitAce extends LitElement {
   }
 
   modeChanged() {
-    if (this.editor == undefined) {
+    if (this.editor == undefined || this.mode == CUSTOM_KEYWORD) {
       return;
     }
+
     this.editor.session.setMode("ace/mode/" + this.mode);
   }
 
@@ -1272,12 +1274,7 @@ class LitAce extends LitElement {
       this.normalizeRules();
     }
 
-    try {
-      ace.require("ace/lib/oop").inherits(customModeFunction, ace.require("ace/mode/text_highlight_rules").TextHighlightRules);
-    } catch (error) {
-      console.error(error)
-      return;
-    }
+    ace.require("ace/lib/oop").inherits(customModeFunction, ace.require("ace/mode/text_highlight_rules").TextHighlightRules);
 
     var TextMode = ace.require("ace/mode/text").Mode;
 
@@ -1304,11 +1301,7 @@ class LitAce extends LitElement {
   /** @private */
   _setCustomMode(mode) {
     if (this._customModes.has(mode)) {
-      try {
-        this.editor.getSession().setMode(this._customModes.get(mode));
-      } catch (error) {
-        console.error(error);
-      }
+      this.editor.session.setMode(this._customModes.get(mode));
     }
   }
 

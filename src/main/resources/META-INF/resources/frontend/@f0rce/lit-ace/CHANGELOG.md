@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.11.1](https://github.com/f0rce/lit-ace/compare/v1.11.0...v1.11.1) (2022-09-02)
+
+
+### Bug Fixes
+
+* use the mode that was used before the custom mode ([cf85fe8](https://github.com/f0rce/lit-ace/commit/cf85fe8e34b83121989ea54fcddfdacb1dfa5a29))
+
 ## [1.11.0](https://github.com/f0rce/lit-ace/compare/v1.10.1...v1.11.0) (2022-08-26)
 
 

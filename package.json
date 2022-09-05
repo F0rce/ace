@@ -2,7 +2,7 @@
   "name": "no-name",
   "license": "UNLICENSED",
   "dependencies": {
-    "@f0rce/lit-ace": "1.11.0",
+    "@f0rce/lit-ace": "1.11.1",
     "@polymer/iron-icon": "3.0.1",
     "@polymer/iron-iconset-svg": "3.0.1",
     "@polymer/iron-list": "3.1.0",
@@ -130,7 +130,7 @@
   },
   "vaadin": {
     "dependencies": {
-      "@f0rce/lit-ace": "1.11.0",
+      "@f0rce/lit-ace": "1.11.1",
       "@polymer/iron-icon": "3.0.1",
       "@polymer/iron-iconset-svg": "3.0.1",
       "@polymer/iron-list": "3.1.0",
@@ -255,7 +255,7 @@
       "workbox-precaching": "6.5.0",
       "workbox-webpack-plugin": "6.5.0"
     },
-    "hash": "1751bb2045583e969915a21b7e79ede1ecada1619656b4fa95ccdb2da5949de0"
+    "hash": "129ce91624e06f316c7dcfde5d2500c6514063a79aa88fdc1d70f3cb4449ea91"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -357,8 +357,6 @@
     "construct-style-sheets-polyfill": "$construct-style-sheets-polyfill",
     "lit": "$lit",
     "@polymer/polymer": "$@polymer/polymer",
-    "chokidar": "$chokidar",
-    "@f0rce/lit-ace": "$@f0rce/lit-ace",
-    "date-fns": "$date-fns"
+    "chokidar": "$chokidar"
   }
 }

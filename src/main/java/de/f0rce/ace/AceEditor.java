@@ -144,7 +144,7 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
           this.getElement().callJsFunction("addCustomMode", key, new Gson().toJson(value));
         }
       }
-      if (!this.customMode.isBlank() && !this.customMode.isEmpty()) {
+      if (!this.customMode.isBlank() && !this.customMode.isEmpty() && this.mode == AceMode.custom) {
         this.setCustomMode(this.customMode);
       }
       this.hasBeenDetached = false;
@@ -191,11 +191,11 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
    * @param mode {@link AceMode}
    */
   public void setMode(AceMode mode) {
-    if (mode.equals(AceMode.custom)) return;
-
     this.getElement().setProperty("mode", mode.toString());
     this.mode = mode;
-    this.customMode = "";
+    if (mode != AceMode.custom) {
+      this.customMode = "";
+    }
   }
 
   /**
@@ -1790,7 +1790,7 @@ public class AceEditor extends Component implements HasSize, HasStyle, Focusable
   public void setCustomMode(String customMode) {
     if (this.customModes.containsKey(customMode)) {
       this.getElement().callJsFunction("setCustomMode", customMode);
-      this.mode = AceMode.custom;
+      setMode(AceMode.custom);
       this.customMode = customMode;
     }
   }

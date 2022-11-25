@@ -1,5 +1,6 @@
 package de.f0rce.ace.util;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import com.google.gson.Gson;
@@ -7,8 +8,9 @@ import de.f0rce.ace.AceEditor;
 import de.f0rce.ace.interfaces.IAceWordCompleter;
 
 /** @author David "F0rce" Dodlek */
-public class AceDynamicWordCompleter implements IAceWordCompleter {
-
+public class AceDynamicWordCompleter implements IAceWordCompleter, Serializable {
+  private static final long serialVersionUID = -459062900322455876L;
+  
   private Map<String, List<String>> dynamicWords;
   private String seperator;
   private String category;

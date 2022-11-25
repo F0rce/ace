@@ -1,11 +1,14 @@
 package de.f0rce.ace.util;
 
 import de.f0rce.ace.enums.AceMarkerColor;
+
+import java.io.Serializable;
 import java.util.UUID;
 
 /** @author David "F0rce" Dodlek */
-public class AceMarker {
-
+public class AceMarker implements Serializable {
+  private static final long serialVersionUID = -5306622806411718397L;
+  
   private String id;
   private int rowStart;
   private int from;

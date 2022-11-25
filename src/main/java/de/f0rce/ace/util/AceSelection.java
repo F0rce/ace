@@ -1,13 +1,16 @@
 package de.f0rce.ace.util;
 
+import java.io.Serializable;
+
 import de.f0rce.ace.events.AceBlurChanged;
 import de.f0rce.ace.events.AceForceSyncDomEvent;
 import de.f0rce.ace.events.AceSelectionChanged;
 import elemental.json.JsonObject;
 
 /** @author David "F0rce" Dodlek */
-public class AceSelection {
-
+public class AceSelection implements Serializable {
+  private static final long serialVersionUID = -4232816207419671039L;
+  
   private int startRow;
   private int startColumn;
   private int endRow;

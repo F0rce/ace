@@ -20,10 +20,6 @@ Vaadin Add-On - [Ace](http://ace.c9.io/) - The High Performance Code Editor
 [2.x](https://github.com/F0rce/ace/tree/master): Built for Vaadin 14 (with Java 8) extends `Component` (LTS)</br>
 [3.x](https://github.com/F0rce/ace/tree/3.x): Built for Vaadin 23 (with Java 11) extends `Component`
 
-## Preview and Demo
-
-[preview.f0rce.de/ace](https://preview.f0rce.de/ace)
-
 
 ## Install
 

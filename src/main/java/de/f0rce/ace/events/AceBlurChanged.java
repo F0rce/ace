@@ -9,10 +9,10 @@ import de.f0rce.ace.util.AceSelection;
 import elemental.json.JsonObject;
 
 /** @author David "F0rce" Dodlek */
-@SuppressWarnings("serial")
 @DomEvent("editor-blur")
 public class AceBlurChanged extends ComponentEvent<AceEditor> {
-
+  private static final long serialVersionUID = -4363961168257667085L;
+  
   private String value;
   private AceSelection selection;
   private AceCursorPosition cursorPosition;

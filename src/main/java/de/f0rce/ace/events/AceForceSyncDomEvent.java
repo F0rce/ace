@@ -9,10 +9,10 @@ import de.f0rce.ace.util.AceSelection;
 import elemental.json.JsonObject;
 
 /** @author David "F0rce" Dodlek */
-@SuppressWarnings("serial")
 @DomEvent("force-sync")
 public class AceForceSyncDomEvent extends ComponentEvent<AceEditor> {
-
+  private static final long serialVersionUID = -2860752603650092426L;
+  
   private String value;
   private AceSelection selection;
   private AceCursorPosition cursorPosition;

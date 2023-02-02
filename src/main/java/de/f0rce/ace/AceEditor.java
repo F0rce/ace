@@ -43,12 +43,12 @@ import de.f0rce.ace.util.AceSelection;
 import de.f0rce.ace.util.AceStaticWordCompleter;
 
 /** @author David "F0rce" Dodlek */
-@SuppressWarnings("serial")
 @Tag("lit-ace")
 @NpmPackage(value = "@f0rce/lit-ace", version = "1.11.1")
 @JsModule("./@f0rce/lit-ace/lit-ace.js")
 public class AceEditor extends Component implements HasSize, HasStyle, Focusable<AceEditor> {
-
+  private static final long serialVersionUID = -1271032625249326755L;
+  
   public static final String DEFAULT_STATIC_CATEGORY = "keyword";
   public static final String DEFAULT_DYNAMIC_CATEGORY = "dynamic";
 

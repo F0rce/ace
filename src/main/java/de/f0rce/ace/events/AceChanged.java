@@ -6,9 +6,10 @@ import com.vaadin.flow.component.EventData;
 import de.f0rce.ace.AceEditor;
 
 /** @author Jean-Christophe "jcgueriaud1" Gueriaud */
-@SuppressWarnings("serial")
 @DomEvent("editor-change")
 public class AceChanged extends ComponentEvent<AceEditor> {
+  private static final long serialVersionUID = -7037867260485774128L;
+  
   private String value;
 
   public AceChanged(

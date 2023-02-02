@@ -6,9 +6,9 @@ import de.f0rce.ace.util.AceCursorPosition;
 import de.f0rce.ace.util.AceSelection;
 
 /** @author David "F0rce" Dodlek */
-@SuppressWarnings("serial")
 public class AceForceSyncEvent extends ComponentEvent<AceEditor> {
-
+  private static final long serialVersionUID = -1096750808791222529L;
+  
   private String value;
   private AceSelection selection;
   private AceCursorPosition cursorPosition;

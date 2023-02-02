@@ -9,10 +9,10 @@ import de.f0rce.ace.util.AceSelection;
 import elemental.json.JsonObject;
 
 /** @author David "F0rce" Dodlek */
-@SuppressWarnings("serial")
 @DomEvent("editor-selection")
 public class AceSelectionChanged extends ComponentEvent<AceEditor> {
-
+  private static final long serialVersionUID = 5663784972918776280L;
+  
   private AceSelection selection;
   private AceCursorPosition cursorPosition;
 

@@ -6,10 +6,10 @@ import com.vaadin.flow.component.EventData;
 import de.f0rce.ace.AceEditor;
 
 /** @author David "F0rce" Dodlek */
-@SuppressWarnings("serial")
 @DomEvent("html-generated")
 public class AceHTMLGeneratedEvent extends ComponentEvent<AceEditor> {
-
+  private static final long serialVersionUID = -6068162857504589793L;
+  
   private String html;
 
   public AceHTMLGeneratedEvent(

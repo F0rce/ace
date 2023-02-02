@@ -1,13 +1,15 @@
 package de.f0rce.ace.util;
 
+import java.io.Serializable;
 import java.util.List;
 import com.google.gson.Gson;
 import de.f0rce.ace.AceEditor;
 import de.f0rce.ace.interfaces.IAceWordCompleter;
 
 /** @author David "F0rce" Dodlek */
-public class AceStaticWordCompleter implements IAceWordCompleter {
-
+public class AceStaticWordCompleter implements IAceWordCompleter, Serializable {
+  private static final long serialVersionUID = -1311138752178496479L;
+  
   private List<String> words;
   private String category;
   private boolean keepCompleters = false;

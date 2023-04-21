@@ -1,7 +1,5 @@
 package de.f0rce;
 
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.Shortcuts;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -16,12 +14,17 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 import de.f0rce.ace.AceEditor;
+import de.f0rce.ace.enums.AceCustomModeTokens;
 import de.f0rce.ace.enums.AceExportType;
 import de.f0rce.ace.enums.AceMode;
 import de.f0rce.ace.enums.AceTheme;
+import de.f0rce.ace.util.AceCustomMode;
+import de.f0rce.ace.util.AceCustomModeRule;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Theme(themeClass = Lumo.class, variant = Lumo.DARK)
 @Route("")
@@ -126,6 +129,37 @@ public class View extends VerticalLayout implements AppShellConfigurator {
     // aceEditor.addCustomAutocompletion(l3, "food", true);
     aceEditor.addDynamicAutocompletion(map, ".", "not dynmaic", true);
 
+    AceCustomMode customMode = new AceCustomMode();
+
+    AceCustomModeRule keywords = new AceCustomModeRule();
+    keywords.setRegex("[a-zA-Z_$][a-zA-Z0-9_$]*\\b");
+    keywords.setKeywordMapper(
+            Map.of(
+                    AceCustomModeTokens.KEYWORD, String.join("|", custom)
+            ),
+            AceCustomModeTokens.IDENTIFIER,
+            true,
+            "|"
+    );
+
+    AceCustomModeRule lineComment = new AceCustomModeRule();
+    lineComment.setRegex("--.*$");
+    lineComment.setToken(AceCustomModeTokens.COMMENT);
+
+    AceCustomModeRule blockComment = new AceCustomModeRule();
+    blockComment.setStart("/\\*");
+    blockComment.setEnd("\\*/");
+    blockComment.setToken(AceCustomModeTokens.COMMENT);
+
+    customMode.addState(
+      "start",
+      lineComment,
+      blockComment,
+      keywords
+    );
+
+    aceEditor.addCustomMode("custom", customMode);
+
     aceEditor.addFocusListener(
         evt -> {
           // aceEditor.openAutocompletion();
@@ -185,7 +219,12 @@ public class View extends VerticalLayout implements AppShellConfigurator {
     modesComboBox.addValueChangeListener(
         event -> {
           if (event.getValue() != null) {
-            aceEditor.setMode(event.getValue());
+            AceMode mode = event.getValue();
+            if (mode == AceMode.custom) {
+              aceEditor.setCustomMode("custom");
+            } else {
+              aceEditor.setMode(mode);
+            }
           }
         });
 

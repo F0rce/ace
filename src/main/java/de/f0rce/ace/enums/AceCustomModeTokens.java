@@ -101,6 +101,8 @@ public enum AceCustomModeTokens {
   /** the name of an attribute (mainly in tags) */
   ENTITY_OTHER_ATTRIBUTE_NAME("entity.other.attribute-name"),
 
+  IDENTIFIER("identifier"),
+
   /** stuff which is "invalid" */
   INVALID("invalid"),
 

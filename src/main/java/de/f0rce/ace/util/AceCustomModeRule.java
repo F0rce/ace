@@ -2,6 +2,7 @@ package de.f0rce.ace.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.stream.Collectors;
 import de.f0rce.ace.enums.AceCustomModeTokens;
 
@@ -19,6 +20,8 @@ public class AceCustomModeRule {
 
   private Object token;
   private String regex;
+  private String start;
+  private String end;
   private String next;
   private String defaultToken;
 
@@ -49,6 +52,15 @@ public class AceCustomModeRule {
             .collect(Collectors.toCollection(ArrayList<String>::new));
   }
 
+  public void setKeywordMapper(Map<AceCustomModeTokens, String> map, AceCustomModeTokens defaultToken, boolean ignoreCase, String splitChar) {
+    this.token = Map.of(
+            "map", map.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getToken(), Map.Entry::getValue)),
+            "defaultToken", defaultToken.getToken(),
+            "ignoreCase", ignoreCase,
+            "splitChar", splitChar
+    );
+  }
+
   /** @return {@link ArrayList} */
   public ArrayList<AceCustomModeTokens> getTokens() {
     if (this.token instanceof ArrayList<?>) {
@@ -76,6 +88,26 @@ public class AceCustomModeRule {
     return this.regex;
   }
 
+  /** @param start {@link String} */
+  public void setStart(String start) {
+    this.start = start;
+  }
+
+  /** @return {@link String} */
+  public String getStart() {
+    return this.start;
+  }
+
+  /** @param end {@link String} */
+  public void setEnd(String end) {
+    this.end = end;
+  }
+
+  /** @return {@link String} */
+  public String getEnd() {
+    return this.end;
+  }
+  
   /** @param next {@link String} */
   public void setNext(String next) {
     this.next = next;

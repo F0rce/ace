@@ -8,7 +8,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.AppShellConfigurator;
@@ -23,9 +23,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-@Theme(themeClass = Lumo.class, variant = Lumo.DARK)
 @Route("")
-public class View extends VerticalLayout implements AppShellConfigurator {
+public class View extends VerticalLayout {
 
   public View() {
 
@@ -167,7 +166,7 @@ public class View extends VerticalLayout implements AppShellConfigurator {
     aceLayout.expand(aceEditor);
     contextMenu.setTarget(aceEditor);
 
-    Label lbl = new Label("Version 1.3.1");
+    NativeLabel lbl = new NativeLabel("Version 1.3.1");
 
     contextMenu.addItem("Version 1.3.1");
 
